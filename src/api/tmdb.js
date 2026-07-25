@@ -58,6 +58,7 @@ export async function getDetails(mediaType, tmdbId) {
     runtimeMinutes,
     genres: (data.genres || []).map((g) => g.name),
     overview: data.overview,
+    numberOfSeasons: mediaType === 'tv' ? data.number_of_seasons : null,
   }
 }
 

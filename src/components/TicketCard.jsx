@@ -1,8 +1,32 @@
-import { posterUrl, providerLogoUrl } from '../api/tmdb'
+import { posterUrl } from '../api/tmdb'
 import { formatRuntime } from '../utils/format'
+import { providerLabel } from '../utils/providers'
 
-export default function TicketCard({ item, onToggleWatched, onRemove }) {
-  const streamProviders = item.providers?.filter((p) => p.kind === 'stream') || []
+function SeasonTracker({ seasons, onToggleSeason }) {
+  const watchedCount = seasons.filter(Boolean).length
+  return (
+    <div className="stub-seasons">
+      <span className="stub-seasons-count">
+        {watchedCount}/{seasons.length}
+      </span>
+      <div className="stub-seasons-list">
+        {seasons.map((watched, i) => (
+          <button
+            key={i}
+            className={`stub-season-chip${watched ? ' is-watched' : ''}`}
+            onClick={() => onToggleSeason(i)}
+            title={`Season ${i + 1}${watched ? ' — watched' : ''}`}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default function TicketCard({ item, onToggleWatched, onToggleSeason, onRemove }) {
+  const isTv = item.mediaType === 'tv' && Array.isArray(item.seasons) && item.seasons.length > 0
 
   return (
     <article className={`ticket${item.watched ? ' is-watched' : ''}`}>
@@ -29,17 +53,12 @@ export default function TicketCard({ item, onToggleWatched, onRemove }) {
             <span className="ticket-genres">{item.genres.slice(0, 3).join(' · ')}</span>
           )}
           <div className="ticket-providers">
-            {streamProviders.length > 0 ? (
-              streamProviders
-                .slice(0, 4)
-                .map((p) => (
-                  <img
-                    key={p.id}
-                    src={providerLogoUrl(p.logoPath)}
-                    alt={p.name}
-                    title={p.name}
-                  />
-                ))
+            {item.providerIds?.length > 0 ? (
+              item.providerIds.map((pid) => (
+                <span key={pid} className="provider-stamp">
+                  {providerLabel(pid)}
+                </span>
+              ))
             ) : (
               <span className="ticket-providers-empty">Not streaming</span>
             )}
@@ -52,9 +71,16 @@ export default function TicketCard({ item, onToggleWatched, onRemove }) {
       <div className="ticket-stub">
         <span className="stub-admit">Admit&nbsp;One</span>
         <span className="stub-runtime">{formatRuntime(item.runtimeMinutes)}</span>
-        <button className="stub-watch-btn" onClick={() => onToggleWatched(item.id)}>
-          {item.watched ? 'Unwatch' : 'Watched'}
-        </button>
+        {isTv ? (
+          <SeasonTracker
+            seasons={item.seasons}
+            onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
+          />
+        ) : (
+          <button className="stub-watch-btn" onClick={() => onToggleWatched(item.id)}>
+            {item.watched ? 'Unwatch' : 'Watched'}
+          </button>
+        )}
       </div>
     </article>
   )

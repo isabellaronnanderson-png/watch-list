@@ -13,7 +13,7 @@ export function EmptyState({ hasAnyItems }) {
   )
 }
 
-export default function TicketGrid({ items, onToggleWatched, onRemove }) {
+export default function TicketGrid({ items, onToggleWatched, onToggleSeason, onRemove }) {
   return (
     <div className="ticket-grid">
       {items.map((item) => (
@@ -21,6 +21,7 @@ export default function TicketGrid({ items, onToggleWatched, onRemove }) {
           key={item.id}
           item={item}
           onToggleWatched={onToggleWatched}
+          onToggleSeason={onToggleSeason}
           onRemove={onRemove}
         />
       ))}

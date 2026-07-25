@@ -64,6 +64,38 @@ input:focus-visible,
   padding: 0 24px 80px;
 }
 
+/* ---------- Tab navigation ---------- */
+
+.tab-nav {
+  display: flex;
+  gap: 4px;
+  padding-top: 28px;
+}
+
+.tab-btn {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--ash);
+  border-bottom: none;
+  color: var(--ash);
+  padding: 9px 20px;
+  border-radius: 5px 5px 0 0;
+  cursor: pointer;
+}
+
+.tab-btn.is-active {
+  background: var(--ink-soft);
+  border-color: rgba(232, 178, 61, 0.4);
+  color: var(--ticket-gold);
+}
+
+.tab-btn:hover:not(.is-active) {
+  color: var(--paper);
+}
+
 /* ---------- Marquee header ---------- */
 
 .marquee {
@@ -150,10 +182,19 @@ input:focus-visible,
   padding: 10px 16px;
   border-bottom: 1px solid rgba(43, 42, 40, 0.1);
   color: var(--pencil);
+  cursor: pointer;
 }
 
 .result-row:last-child {
   border-bottom: none;
+}
+
+.result-row:hover:not(.is-disabled) {
+  background: rgba(59, 110, 100, 0.08);
+}
+
+.result-row.is-disabled {
+  cursor: default;
 }
 
 .result-row img {
@@ -193,20 +234,17 @@ input:focus-visible,
   text-transform: uppercase;
   background: var(--reel-teal);
   color: var(--paper);
-  border: none;
   border-radius: 2px;
   padding: 8px 12px;
-  cursor: pointer;
   flex-shrink: 0;
 }
 
-.result-add:hover {
+.result-row:hover:not(.is-disabled) .result-add {
   background: #325c53;
 }
 
-.result-add:disabled {
+.result-row.is-disabled .result-add {
   background: var(--ash);
-  cursor: default;
 }
 
 .results-status {
@@ -389,20 +427,75 @@ input:focus-visible,
 
 .ticket-providers {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   margin-top: 4px;
 }
 
-.ticket-providers img {
-  width: 18px;
-  height: 18px;
-  border-radius: 4px;
+.provider-stamp {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--reel-teal);
+  border: 1px solid var(--reel-teal);
+  border-radius: 2px;
+  padding: 2px 5px;
+  white-space: nowrap;
 }
 
 .ticket-providers-empty {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--ash);
+}
+
+/* ---------- Season tracker (TV shows) ---------- */
+
+.stub-seasons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.stub-seasons-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--pencil);
+  font-weight: 500;
+}
+
+.stub-seasons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 140px;
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.stub-season-chip {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--pencil);
+  background: transparent;
+  color: var(--pencil);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+}
+
+.stub-season-chip.is-watched {
+  background: var(--ticket-gold);
+  border-color: var(--ticket-gold);
+  color: var(--ink);
+  font-weight: 600;
 }
 
 /* perforation divider between main and stub */
@@ -551,4 +644,179 @@ input:focus-visible,
   text-transform: uppercase;
   color: var(--ash);
   margin: 0 0 16px;
+}
+
+/* ---------- Manual add form (Listen tab) ---------- */
+
+.custom-add-toggle {
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: var(--reel-teal);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0;
+}
+
+.custom-add-form {
+  margin-top: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  background: var(--ink-soft);
+  border: 1px solid rgba(232, 178, 61, 0.18);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.custom-add-form input {
+  flex: 1;
+  min-width: 160px;
+  background: var(--paper);
+  color: var(--pencil);
+  border: none;
+  border-radius: 3px;
+  padding: 10px 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* ---------- Listen tab: square tiles ---------- */
+
+.listen-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 28px;
+}
+
+.listen-tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--reel-teal);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, opacity 0.2s ease;
+}
+
+.listen-tile:hover {
+  transform: translateY(-2px);
+}
+
+.listen-tile.is-listened {
+  opacity: 0.55;
+}
+
+.listen-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.listen-tile-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--reel-teal),
+    var(--reel-teal) 10px,
+    #345f56 10px,
+    #345f56 20px
+  );
+}
+
+.listen-tile-fallback span {
+  font-family: var(--font-display);
+  font-size: 20px;
+  color: var(--paper);
+  text-align: center;
+  line-height: 1.05;
+}
+
+.listen-tile-kind {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(20, 23, 31, 0.75);
+  color: var(--ticket-gold);
+  padding: 3px 6px;
+  border-radius: 2px;
+}
+
+.listen-tile-remove {
+  top: 6px !important;
+  right: 6px !important;
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 11px !important;
+}
+
+.listen-tile-toggle {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  z-index: 1;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--paper);
+  background: rgba(20, 23, 31, 0.75);
+  color: var(--paper);
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.listen-tile-toggle.is-listened {
+  background: var(--ticket-gold);
+  border-color: var(--ticket-gold);
+  color: var(--ink);
+}
+
+.listen-tile-info {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  background: linear-gradient(to top, rgba(20, 23, 31, 0.92), rgba(20, 23, 31, 0));
+  padding: 30px 10px 10px;
+}
+
+.listen-tile-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  color: var(--paper);
+  line-height: 1.05;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.listen-tile-author {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ash);
+  margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

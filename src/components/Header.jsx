@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchTitles, getDetails, getWatchProviders, posterUrl } from '../api/tmdb'
 import { yearFromDate } from '../utils/format'
+import { canonicalizeProvider } from '../utils/providers'
 
 export default function Header({ onAdd, existingIds, genreMaps }) {
   const [query, setQuery] = useState('')
@@ -50,6 +51,10 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
               .map((gid) => genreMaps?.[mediaType]?.[gid])
               .filter(Boolean)
 
+      const canonicalProviderIds = Array.from(
+        new Set(providers.map(canonicalizeProvider).filter(Boolean))
+      )
+
       onAdd({
         id,
         tmdbId,
@@ -59,7 +64,8 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
         posterPath: result.poster_path,
         runtimeMinutes: details.runtimeMinutes,
         genres: genreNames,
-        providers,
+        providerIds: canonicalProviderIds,
+        numberOfSeasons: mediaType === 'tv' ? details.numberOfSeasons : null,
       })
       setQuery('')
       setResults([])
@@ -100,8 +106,21 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
                 const already = existingIds.has(id)
                 const title = r.title || r.name
                 const dateStr = r.release_date || r.first_air_date
+                const disabled = already || addingId === id
                 return (
-                  <div className="result-row" key={id}>
+                  <div
+                    className={`result-row${disabled ? ' is-disabled' : ''}`}
+                    key={id}
+                    role="button"
+                    tabIndex={disabled ? -1 : 0}
+                    onClick={() => !disabled && handleAdd(r)}
+                    onKeyDown={(e) => {
+                      if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+                        e.preventDefault()
+                        handleAdd(r)
+                      }
+                    }}
+                  >
                     {r.poster_path ? (
                       <img src={posterUrl(r.poster_path, 'w92')} alt="" />
                     ) : (
@@ -114,13 +133,9 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
                         {yearFromDate(dateStr) ? ` · ${yearFromDate(dateStr)}` : ''}
                       </div>
                     </div>
-                    <button
-                      className="result-add"
-                      disabled={already || addingId === id}
-                      onClick={() => handleAdd(r)}
-                    >
+                    <span className="result-add">
                       {already ? 'Added' : addingId === id ? 'Adding…' : 'Add'}
-                    </button>
+                    </span>
                   </div>
                 )
               })}

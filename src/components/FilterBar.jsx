@@ -1,18 +1,35 @@
-import { RUNTIME_BUCKETS } from '../utils/format'
+import { RUNTIME_BUCKETS, MEDIA_TYPES } from '../utils/format'
+import { ALL_PROVIDER_FILTER_OPTIONS } from '../utils/providers'
 
 export default function FilterBar({
   allGenres,
-  allProviders,
   filters,
   onToggleGenre,
   onToggleRuntime,
   onToggleProvider,
+  onToggleMediaType,
   onSortChange,
   onClear,
   hasActiveFilters,
 }) {
   return (
     <div className="filter-window">
+      <div className="filter-group">
+        <span className="filter-group-label">Type</span>
+        <div className="chip-row">
+          {MEDIA_TYPES.map((t) => (
+            <button
+              key={t.id}
+              className="chip"
+              aria-pressed={filters.mediaTypes.has(t.id)}
+              onClick={() => onToggleMediaType(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="filter-group">
         <span className="filter-group-label">Genre</span>
         <div className="chip-row">
@@ -51,17 +68,14 @@ export default function FilterBar({
       <div className="filter-group">
         <span className="filter-group-label">Streaming on</span>
         <div className="chip-row">
-          {allProviders.length === 0 && (
-            <span className="stub-admit">No providers found yet</span>
-          )}
-          {allProviders.map((p) => (
+          {ALL_PROVIDER_FILTER_OPTIONS.map((p) => (
             <button
-              key={p}
+              key={p.id}
               className="chip"
-              aria-pressed={filters.providers.has(p)}
-              onClick={() => onToggleProvider(p)}
+              aria-pressed={filters.providers.has(p.id)}
+              onClick={() => onToggleProvider(p.id)}
             >
-              {p}
+              {p.label}
             </button>
           ))}
         </div>
