@@ -1,35 +1,13 @@
 import { posterUrl } from '../api/tmdb'
-import { formatRuntime } from '../utils/format'
+import { formatRuntime, WATCH_STATUSES } from '../utils/format'
 import { providerLabel } from '../utils/providers'
+import StatusStub from './StatusStub'
 
-function SeasonTracker({ seasons, onToggleSeason }) {
-  const watchedCount = seasons.filter(Boolean).length
+const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
+
+export default function TicketCard({ item, onSetStatus, onRemove }) {
   return (
-    <div className="stub-seasons">
-      <span className="stub-seasons-count">
-        {watchedCount}/{seasons.length}
-      </span>
-      <div className="stub-seasons-list">
-        {seasons.map((watched, i) => (
-          <button
-            key={i}
-            className={`stub-season-chip${watched ? ' is-watched' : ''}`}
-            onClick={() => onToggleSeason(i)}
-            title={`Season ${i + 1}${watched ? ' — watched' : ''}`}
-          >
-            {i + 1}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-export default function TicketCard({ item, onToggleWatched, onToggleSeason, onRemove }) {
-  const isTv = item.mediaType === 'tv' && Array.isArray(item.seasons) && item.seasons.length > 0
-
-  return (
-    <article className={`ticket${item.watched ? ' is-watched' : ''}`}>
+    <article className={`ticket${item.status === 'watched' ? ' is-done' : ''}`}>
       <button
         className="ticket-remove"
         onClick={() => onRemove(item.id)}
@@ -71,16 +49,12 @@ export default function TicketCard({ item, onToggleWatched, onToggleSeason, onRe
       <div className="ticket-stub">
         <span className="stub-admit">Admit&nbsp;One</span>
         <span className="stub-runtime">{formatRuntime(item.runtimeMinutes)}</span>
-        {isTv ? (
-          <SeasonTracker
-            seasons={item.seasons}
-            onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
-          />
-        ) : (
-          <button className="stub-watch-btn" onClick={() => onToggleWatched(item.id)}>
-            {item.watched ? 'Unwatch' : 'Watched'}
-          </button>
-        )}
+        <StatusStub
+          statuses={WATCH_STATUSES}
+          status={item.status}
+          onSetStatus={(s) => onSetStatus(item.id, s)}
+          labels={LABELS}
+        />
       </div>
     </article>
   )

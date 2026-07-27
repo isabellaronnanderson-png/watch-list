@@ -11,11 +11,12 @@ const EMPTY_FILTERS = {
   runtimes: new Set(),
   providers: new Set(),
   mediaTypes: new Set(),
+  statuses: new Set(),
   sort: 'added',
 }
 
 export default function WatchTab() {
-  const { items, addItem, removeItem, toggleWatched, toggleSeason } = useWatchlist()
+  const { items, addItem, removeItem, setStatus } = useWatchlist()
   const [genreMaps, setGenreMaps] = useState(null)
   const [configError, setConfigError] = useState(null)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
@@ -47,11 +48,15 @@ export default function WatchTab() {
     filters.genres.size > 0 ||
     filters.runtimes.size > 0 ||
     filters.providers.size > 0 ||
-    filters.mediaTypes.size > 0
+    filters.mediaTypes.size > 0 ||
+    filters.statuses.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
       if (filters.mediaTypes.size > 0 && !filters.mediaTypes.has(item.mediaType)) {
+        return false
+      }
+      if (filters.statuses.size > 0 && !filters.statuses.has(item.status)) {
         return false
       }
       if (filters.genres.size > 0) {
@@ -81,6 +86,9 @@ export default function WatchTab() {
     return list
   }, [items, filters])
 
+  const watchingItems = visibleItems.filter((i) => i.status === 'watching')
+  const restItems = visibleItems.filter((i) => i.status !== 'watching')
+
   return (
     <>
       <Header onAdd={addItem} existingIds={existingIds} genreMaps={genreMaps} />
@@ -99,24 +107,30 @@ export default function WatchTab() {
         onToggleRuntime={(r) => toggleSetValue('runtimes', r)}
         onToggleProvider={(p) => toggleSetValue('providers', p)}
         onToggleMediaType={(t) => toggleSetValue('mediaTypes', t)}
+        onToggleStatus={(s) => toggleSetValue('statuses', s)}
         onSortChange={(sort) => setFilters((prev) => ({ ...prev, sort }))}
         onClear={() => setFilters(EMPTY_FILTERS)}
         hasActiveFilters={hasActiveFilters}
       />
 
+      {watchingItems.length > 0 && (
+        <>
+          <p className="section-heading section-heading-highlight">
+            Currently watching · {watchingItems.length}
+          </p>
+          <TicketGrid items={watchingItems} onSetStatus={setStatus} onRemove={removeItem} />
+          <div className="section-divider" />
+        </>
+      )}
+
       <p className="section-heading">
-        {visibleItems.length} title{visibleItems.length === 1 ? '' : 's'} on the reel
+        {restItems.length} title{restItems.length === 1 ? '' : 's'} on the reel
       </p>
 
-      {visibleItems.length > 0 ? (
-        <TicketGrid
-          items={visibleItems}
-          onToggleWatched={toggleWatched}
-          onToggleSeason={toggleSeason}
-          onRemove={removeItem}
-        />
+      {restItems.length > 0 ? (
+        <TicketGrid items={restItems} onSetStatus={setStatus} onRemove={removeItem} />
       ) : (
-        <EmptyState hasAnyItems={items.length > 0} />
+        watchingItems.length === 0 && <EmptyState hasAnyItems={items.length > 0} />
       )}
     </>
   )

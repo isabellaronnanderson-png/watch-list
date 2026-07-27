@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react'
 import ReadHeader from './ReadHeader'
 import BookTicket from './BookTicket'
 import { useReadlist } from '../hooks/useReadlist'
+import { READ_STATUSES } from '../utils/format'
 
-const EMPTY_FILTERS = { genres: new Set(), status: 'all', sort: 'added' }
+const EMPTY_FILTERS = { genres: new Set(), statuses: new Set(), sort: 'added' }
 
 export default function ReadTab() {
-  const { items, addItem, removeItem, toggleRead } = useReadlist()
+  const { items, addItem, removeItem, setStatus } = useReadlist()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
@@ -17,21 +18,20 @@ export default function ReadTab() {
     return Array.from(s).sort()
   }, [items])
 
-  function toggleGenre(g) {
+  function toggleSetValue(setName, value) {
     setFilters((prev) => {
-      const next = new Set(prev.genres)
-      if (next.has(g)) next.delete(g)
-      else next.add(g)
-      return { ...prev, genres: next }
+      const next = new Set(prev[setName])
+      if (next.has(value)) next.delete(value)
+      else next.add(value)
+      return { ...prev, [setName]: next }
     })
   }
 
-  const hasActiveFilters = filters.genres.size > 0 || filters.status !== 'all'
+  const hasActiveFilters = filters.genres.size > 0 || filters.statuses.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
-      if (filters.status === 'unread' && item.read) return false
-      if (filters.status === 'read' && !item.read) return false
+      if (filters.statuses.size > 0 && !filters.statuses.has(item.status)) return false
       if (filters.genres.size > 0) {
         const hasGenre = item.genres?.some((g) => filters.genres.has(g))
         if (!hasGenre) return false
@@ -45,6 +45,9 @@ export default function ReadTab() {
     return list
   }, [items, filters])
 
+  const readingItems = visibleItems.filter((i) => i.status === 'reading')
+  const restItems = visibleItems.filter((i) => i.status !== 'reading')
+
   return (
     <>
       <ReadHeader onAdd={addItem} existingIds={existingIds} />
@@ -53,16 +56,12 @@ export default function ReadTab() {
         <div className="filter-group">
           <span className="filter-group-label">Status</span>
           <div className="chip-row">
-            {[
-              { id: 'all', label: 'All' },
-              { id: 'unread', label: 'To read' },
-              { id: 'read', label: 'Read' },
-            ].map((s) => (
+            {READ_STATUSES.map((s) => (
               <button
                 key={s.id}
                 className="chip"
-                aria-pressed={filters.status === s.id}
-                onClick={() => setFilters((prev) => ({ ...prev, status: s.id }))}
+                aria-pressed={filters.statuses.has(s.id)}
+                onClick={() => toggleSetValue('statuses', s.id)}
               >
                 {s.label}
               </button>
@@ -81,7 +80,7 @@ export default function ReadTab() {
                 key={g}
                 className="chip"
                 aria-pressed={filters.genres.has(g)}
-                onClick={() => toggleGenre(g)}
+                onClick={() => toggleSetValue('genres', g)}
               >
                 {g}
               </button>
@@ -108,30 +107,41 @@ export default function ReadTab() {
         )}
       </div>
 
+      {readingItems.length > 0 && (
+        <>
+          <p className="section-heading section-heading-highlight">
+            Currently reading · {readingItems.length}
+          </p>
+          <div className="ticket-grid">
+            {readingItems.map((item) => (
+              <BookTicket key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
+            ))}
+          </div>
+          <div className="section-divider" />
+        </>
+      )}
+
       <p className="section-heading">
-        {visibleItems.length} book{visibleItems.length === 1 ? '' : 's'} on the shelf
+        {restItems.length} book{restItems.length === 1 ? '' : 's'} on the shelf
       </p>
 
-      {visibleItems.length > 0 ? (
+      {restItems.length > 0 ? (
         <div className="ticket-grid">
-          {visibleItems.map((item) => (
-            <BookTicket
-              key={item.id}
-              item={item}
-              onToggleRead={toggleRead}
-              onRemove={removeItem}
-            />
+          {restItems.map((item) => (
+            <BookTicket key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
           ))}
         </div>
       ) : (
-        <div className="empty-state">
-          <h2>{items.length > 0 ? 'No books match the filter' : 'The shelf is bare'}</h2>
-          <p>
-            {items.length > 0
-              ? 'Try clearing a filter.'
-              : 'Search above to check out your first book.'}
-          </p>
-        </div>
+        readingItems.length === 0 && (
+          <div className="empty-state">
+            <h2>{items.length > 0 ? 'No books match the filter' : 'The shelf is bare'}</h2>
+            <p>
+              {items.length > 0
+                ? 'Try clearing a filter.'
+                : 'Search above to check out your first book.'}
+            </p>
+          </div>
+        )
       )}
     </>
   )

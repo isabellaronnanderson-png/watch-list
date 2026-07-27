@@ -1,4 +1,4 @@
-import { RUNTIME_BUCKETS, MEDIA_TYPES } from '../utils/format'
+import { RUNTIME_BUCKETS, MEDIA_TYPES, WATCH_STATUSES } from '../utils/format'
 import { ALL_PROVIDER_FILTER_OPTIONS } from '../utils/providers'
 
 export default function FilterBar({
@@ -8,12 +8,29 @@ export default function FilterBar({
   onToggleRuntime,
   onToggleProvider,
   onToggleMediaType,
+  onToggleStatus,
   onSortChange,
   onClear,
   hasActiveFilters,
 }) {
   return (
     <div className="filter-window">
+      <div className="filter-group">
+        <span className="filter-group-label">Status</span>
+        <div className="chip-row">
+          {WATCH_STATUSES.map((s) => (
+            <button
+              key={s.id}
+              className="chip"
+              aria-pressed={filters.statuses.has(s.id)}
+              onClick={() => onToggleStatus(s.id)}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="filter-group">
         <span className="filter-group-label">Type</span>
         <div className="chip-row">

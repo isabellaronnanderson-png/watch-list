@@ -1,9 +1,12 @@
 import { coverUrl } from '../api/openLibrary'
-import { formatPages } from '../utils/format'
+import { formatPages, READ_STATUSES } from '../utils/format'
+import StatusStub from './StatusStub'
 
-export default function BookTicket({ item, onToggleRead, onRemove }) {
+const LABELS = { want: 'Want', reading: 'Reading', read: 'Read' }
+
+export default function BookTicket({ item, onSetStatus, onRemove }) {
   return (
-    <article className={`ticket${item.read ? ' is-watched' : ''}`}>
+    <article className={`ticket${item.status === 'read' ? ' is-done' : ''}`}>
       <button
         className="ticket-remove"
         onClick={() => onRemove(item.id)}
@@ -37,9 +40,12 @@ export default function BookTicket({ item, onToggleRead, onRemove }) {
       <div className="ticket-stub">
         <span className="stub-admit">Library&nbsp;Card</span>
         <span className="stub-runtime">{formatPages(item.pageCount)}</span>
-        <button className="stub-watch-btn" onClick={() => onToggleRead(item.id)}>
-          {item.read ? 'Unread' : 'Read'}
-        </button>
+        <StatusStub
+          statuses={READ_STATUSES}
+          status={item.status}
+          onSetStatus={(s) => onSetStatus(item.id, s)}
+          labels={LABELS}
+        />
       </div>
     </article>
   )

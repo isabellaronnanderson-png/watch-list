@@ -1,11 +1,38 @@
 import { useEffect, useState, useCallback } from 'react'
+import { canonicalizeProvider } from '../utils/providers'
 
 const STORAGE_KEY = 'marquee-watchlist:items'
+
+// Repairs items saved by older versions of the app:
+// - `watched: true/false` -> `status: 'watched'/'want'`
+// - `providers: [...raw TMDB objects]` (pre-simplification) -> `providerIds: [...]`
+// - drops the old per-season array; season tracking was replaced by `status`
+function migrateItem(item) {
+  const migrated = { ...item }
+
+  if (!migrated.status) {
+    migrated.status = migrated.watched ? 'watched' : 'want'
+  }
+
+  if (!migrated.providerIds && Array.isArray(migrated.providers)) {
+    migrated.providerIds = Array.from(
+      new Set(migrated.providers.map(canonicalizeProvider).filter(Boolean))
+    )
+  }
+  if (!migrated.providerIds) migrated.providerIds = []
+
+  delete migrated.watched
+  delete migrated.providers
+  delete migrated.seasons
+
+  return migrated
+}
 
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
+    if (!raw) return []
+    return JSON.parse(raw).map(migrateItem)
   } catch {
     return []
   }
@@ -21,11 +48,7 @@ export function useWatchlist() {
   const addItem = useCallback((item) => {
     setItems((prev) => {
       if (prev.some((p) => p.id === item.id)) return prev
-      const seasons =
-        item.mediaType === 'tv' && item.numberOfSeasons > 0
-          ? Array(item.numberOfSeasons).fill(false)
-          : null
-      return [{ ...item, watched: false, seasons, addedAt: Date.now() }, ...prev]
+      return [{ ...item, status: 'want', addedAt: Date.now() }, ...prev]
     })
   }, [])
 
@@ -33,23 +56,9 @@ export function useWatchlist() {
     setItems((prev) => prev.filter((p) => p.id !== id))
   }, [])
 
-  // For films: simple on/off toggle.
-  const toggleWatched = useCallback((id) => {
-    setItems((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, watched: !p.watched } : p))
-    )
+  const setStatus = useCallback((id, status) => {
+    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
   }, [])
 
-  // For TV shows: toggle one season, and mark the whole show watched once every season is.
-  const toggleSeason = useCallback((id, seasonIndex) => {
-    setItems((prev) =>
-      prev.map((p) => {
-        if (p.id !== id || !p.seasons) return p
-        const seasons = p.seasons.map((s, i) => (i === seasonIndex ? !s : s))
-        return { ...p, seasons, watched: seasons.every(Boolean) }
-      })
-    )
-  }, [])
-
-  return { items, addItem, removeItem, toggleWatched, toggleSeason }
+  return { items, addItem, removeItem, setStatus }
 }

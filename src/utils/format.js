@@ -19,6 +19,18 @@ export function formatPages(count) {
   return `${count} PP`
 }
 
+export const WATCH_STATUSES = [
+  { id: 'want', label: 'Want to watch' },
+  { id: 'watching', label: 'Watching' },
+  { id: 'watched', label: 'Watched' },
+]
+
+export const READ_STATUSES = [
+  { id: 'want', label: 'Want to read' },
+  { id: 'reading', label: 'Reading' },
+  { id: 'read', label: 'Read' },
+]
+
 export const MEDIA_TYPES = [
   { id: 'movie', label: 'Films' },
   { id: 'tv', label: 'TV Shows' },

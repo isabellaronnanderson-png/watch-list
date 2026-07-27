@@ -5,14 +5,14 @@
 export const CANONICAL_PROVIDERS = [
   { id: 'netflix', label: 'Netflix', match: (n) => /netflix/i.test(n) },
   { id: 'disney', label: 'Disney+', match: (n) => /disney/i.test(n) },
-  { id: 'hbomax', label: 'HBO Max', match: (n) => /hbo|max\b/i.test(n) },
+  { id: 'hbomax', label: 'HBO Max', match: (n) => /\b(hbo|max)\b/i.test(n) },
   { id: 'appletv', label: 'Apple TV', match: (n) => /apple/i.test(n) },
   { id: 'crunchyroll', label: 'Crunchyroll', match: (n) => /crunchyroll/i.test(n) },
   { id: 'iplayer', label: 'BBC iPlayer', match: (n) => /bbc/i.test(n) },
   { id: 'now', label: 'NOW', match: (n) => /^now\b/i.test(n.trim()) },
   { id: 'itvx', label: 'ITVX', match: (n) => /itv/i.test(n) },
   { id: 'mubi', label: 'Mubi', match: (n) => /mubi/i.test(n) },
-  { id: 'channel4', label: 'Channel 4', match: (n) => /channel ?4|all4/i.test(n) },
+  { id: 'channel4', label: 'Channel 4', match: (n) => /channel ?4|all ?4/i.test(n) },
 ]
 
 // Catch-all for anything TMDB lists as rent/buy only, or a stream provider
@@ -21,15 +21,17 @@ export const RENT_PROVIDER = { id: 'rent', label: 'Rent / Buy' }
 
 /**
  * Map a raw TMDB provider result to a canonical id.
- * Stream/ad-supported/free providers map to their named service if recognized,
- * otherwise fall through to null (not shown). Rent/buy providers always map to "rent".
+ * Named-service matching always takes priority (e.g. an "Apple TV" rent listing
+ * should show as Apple TV, not just get lumped into the generic Rent/Buy bucket).
+ * Only falls through to the generic Rent/Buy id if nothing named matches.
  */
 export function canonicalizeProvider(rawProvider) {
+  const match = CANONICAL_PROVIDERS.find((p) => p.match(rawProvider.name || ''))
+  if (match) return match.id
   if (rawProvider.kind === 'rent' || rawProvider.kind === 'buy') {
     return RENT_PROVIDER.id
   }
-  const match = CANONICAL_PROVIDERS.find((p) => p.match(rawProvider.name))
-  return match ? match.id : null
+  return null
 }
 
 export function providerLabel(id) {

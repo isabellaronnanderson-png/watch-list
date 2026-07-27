@@ -2,10 +2,20 @@ import { useCallback, useEffect, useState } from 'react'
 
 const STORAGE_KEY = 'marquee-watchlist:books'
 
+function migrateItem(item) {
+  const migrated = { ...item }
+  if (!migrated.status) {
+    migrated.status = migrated.read ? 'read' : 'want'
+  }
+  delete migrated.read
+  return migrated
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
+    if (!raw) return []
+    return JSON.parse(raw).map(migrateItem)
   } catch {
     return []
   }
@@ -21,7 +31,7 @@ export function useReadlist() {
   const addItem = useCallback((item) => {
     setItems((prev) => {
       if (prev.some((p) => p.id === item.id)) return prev
-      return [{ ...item, read: false, addedAt: Date.now() }, ...prev]
+      return [{ ...item, status: 'want', addedAt: Date.now() }, ...prev]
     })
   }, [])
 
@@ -29,9 +39,9 @@ export function useReadlist() {
     setItems((prev) => prev.filter((p) => p.id !== id))
   }, [])
 
-  const toggleRead = useCallback((id) => {
-    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, read: !p.read } : p)))
+  const setStatus = useCallback((id, status) => {
+    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
   }, [])
 
-  return { items, addItem, removeItem, toggleRead }
+  return { items, addItem, removeItem, setStatus }
 }
