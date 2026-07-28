@@ -1,23 +1,17 @@
 import { coverUrl } from '../api/openLibrary'
+import { LISTEN_STATUSES } from '../utils/format'
+import StatusStub from './StatusStub'
 
-export default function ListenTile({ item, onToggleListened, onRemove }) {
+const LABELS = { want: 'Want', listening: 'Listening', listened: 'Listened' }
+
+export default function ListenTile({ item, onSetStatus, onRemove }) {
   const isAudiobook = item.kind === 'audiobook'
-  const cover = isAudiobook ? coverUrl(item.coverId, 'L') : null
+  const cover = isAudiobook ? coverUrl(item.coverId, 'M') : null
 
   return (
-    <div className={`listen-tile${item.listened ? ' is-listened' : ''}`}>
-      {cover ? (
-        <img src={cover} alt="" />
-      ) : (
-        <div className="listen-tile-fallback">
-          <span>{item.title}</span>
-        </div>
-      )}
-
-      <span className="listen-tile-kind">{isAudiobook ? 'Audiobook' : 'Manual'}</span>
-
+    <article className={`media-card${item.status === 'listened' ? ' is-done' : ''}`}>
       <button
-        className="ticket-remove listen-tile-remove"
+        className="media-card-remove"
         onClick={() => onRemove(item.id)}
         aria-label={`Remove ${item.title}`}
         title="Remove"
@@ -25,22 +19,31 @@ export default function ListenTile({ item, onToggleListened, onRemove }) {
         ×
       </button>
 
-      <button
-        className={`listen-tile-toggle${item.listened ? ' is-listened' : ''}`}
-        onClick={() => onToggleListened(item.id)}
-        title={item.listened ? 'Mark unlistened' : 'Mark listened'}
-      >
-        ✓
-      </button>
-
-      <div className="listen-tile-info">
-        <div className="listen-tile-title">{item.title}</div>
-        {isAudiobook ? (
-          <div className="listen-tile-author">{item.author}</div>
+      <div className="media-card-cover">
+        {cover ? (
+          <img src={cover} alt="" style={{ objectPosition: 'center 15%' }} />
         ) : (
-          item.subtitle && <div className="listen-tile-author">{item.subtitle}</div>
+          <div className="media-card-cover-empty media-card-cover-fallback">
+            <span>{item.title}</span>
+          </div>
         )}
       </div>
-    </div>
+
+      <div className="media-card-body">
+        <span className="media-card-kind">{isAudiobook ? 'Audiobook' : 'Manual'}</span>
+        <h3 className="media-card-title">{item.title}</h3>
+        {isAudiobook ? (
+          <p className="media-card-sub">{item.author}</p>
+        ) : (
+          item.subtitle && <p className="media-card-sub">{item.subtitle}</p>
+        )}
+        <StatusStub
+          statuses={LISTEN_STATUSES}
+          status={item.status}
+          onSetStatus={(s) => onSetStatus(item.id, s)}
+          labels={LABELS}
+        />
+      </div>
+    </article>
   )
 }

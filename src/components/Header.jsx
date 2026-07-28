@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { searchTitles, getDetails, getWatchProviders, posterUrl } from '../api/tmdb'
 import { yearFromDate } from '../utils/format'
 import { canonicalizeProvider } from '../utils/providers'
+import HeroBanner from './HeroBanner'
 
 export default function Header({ onAdd, existingIds, genreMaps }) {
   const [query, setQuery] = useState('')
@@ -78,15 +79,10 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
   }
 
   return (
-    <header className="marquee">
-      <p className="marquee-eyebrow">Box office · now booking</p>
-      <h1 className="marquee-title">Now Showing</h1>
-      <p className="marquee-sub">
-        Your watchlist, ticketed. Search a title to print a stub, filter the reel by genre,
-        runtime, or where it's streaming.
-      </p>
+    <>
+      <HeroBanner title="Watch" />
 
-      <div className="box-office">
+      <div className="search-bar">
         <input
           type="text"
           value={query}
@@ -94,7 +90,7 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
           placeholder="Search for a film or show…"
           aria-label="Search for a film or TV show to add"
         />
-        <span className="box-office-label">Ticket window</span>
+        <span className="search-bar-label">Search</span>
 
         {(status === 'loading' || status === 'error' || results.length > 0) && (
           <div className="results-panel" role="listbox">
@@ -145,6 +141,6 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
           </div>
         )}
       </div>
-    </header>
+    </>
   )
 }

@@ -1,11 +1,19 @@
-# Now Showing — a ticket-stub watchlist, reading list & listen queue
+# A media tracker: Watch, Read, Listen, YouTube
 
-A media tracker styled like a box office: three tabs — **Watch**, **Read**, **Listen** —
-each themed to its content. Watch keeps the original ticket-stub design (TMDB search,
-genre/runtime/type/streaming-service filters, per-season watched tracking for TV). Read
-is a library-card styled book list (Open Library search, no API key needed). Listen is a
-grid of square Audible-style tiles for audiobooks, plus a manual "add your own" form for
-podcast episodes or anything without a good public API.
+A clean, white, minimal media tracker across four tabs — **Watch**, **Read**, **Listen**,
+**YouTube** — each with its own accent color, its own search, and its own status tracking
+(Want → In progress → Done). Each tab opens with an original "wall of spines" banner
+illustration (built in CSS, not a photo) tinted to that tab's accent color, with the tab
+name centered on top.
+
+- **Watch**: TMDB search, genre/runtime/type/streaming-service filters, status per title
+  (want to watch / watching / watched).
+- **Read**: Open Library search (no API key needed), genre filter, status per book.
+- **Listen**: audiobooks via Open Library, rendered as the same square cards as everything
+  else; anything without a good API (podcast episodes, one-offs) gets added through a
+  manual form instead. Same status tracking as Read.
+- **YouTube**: paste any link and it pulls the title/channel/thumbnail via YouTube's free
+  oEmbed endpoint (no API key). Same status tracking as Watch.
 
 ## Setup
 

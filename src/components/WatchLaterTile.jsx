@@ -1,13 +1,13 @@
-export default function WatchLaterTile({ item, onToggleWatched, onRemove }) {
-  return (
-    <div className={`reel-tile${item.watched ? ' is-done' : ''}`}>
-      <a className="reel-tile-thumb" href={item.url} target="_blank" rel="noreferrer">
-        <img src={item.thumbnail} alt="" />
-        <span className="reel-tile-play">▶</span>
-      </a>
+import { WATCH_STATUSES } from '../utils/format'
+import StatusStub from './StatusStub'
 
+const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
+
+export default function WatchLaterTile({ item, onSetStatus, onRemove }) {
+  return (
+    <article className={`media-card${item.status === 'watched' ? ' is-done' : ''}`}>
       <button
-        className="ticket-remove reel-tile-remove"
+        className="media-card-remove"
         onClick={() => onRemove(item.id)}
         aria-label={`Remove ${item.title}`}
         title="Remove"
@@ -15,17 +15,22 @@ export default function WatchLaterTile({ item, onToggleWatched, onRemove }) {
         ×
       </button>
 
-      <div className="reel-tile-info">
-        <h3 className="reel-tile-title">{item.title}</h3>
-        {item.channel && <span className="reel-tile-channel">{item.channel}</span>}
-      </div>
+      <a className="media-card-cover media-card-cover-wide" href={item.url} target="_blank" rel="noreferrer">
+        <img src={item.thumbnail} alt="" />
+        <span className="media-card-play">▶</span>
+      </a>
 
-      <button
-        className={`reel-tile-toggle${item.watched ? ' is-active' : ''}`}
-        onClick={() => onToggleWatched(item.id)}
-      >
-        {item.watched ? 'Watched' : 'Mark watched'}
-      </button>
-    </div>
+      <div className="media-card-body">
+        <span className="media-card-kind">YouTube</span>
+        <h3 className="media-card-title">{item.title}</h3>
+        {item.channel && <p className="media-card-sub">{item.channel}</p>}
+        <StatusStub
+          statuses={WATCH_STATUSES}
+          status={item.status}
+          onSetStatus={(s) => onSetStatus(item.id, s)}
+          labels={LABELS}
+        />
+      </div>
+    </article>
   )
 }

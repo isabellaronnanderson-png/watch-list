@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchBooks, coverUrl } from '../api/openLibrary'
+import HeroBanner from './HeroBanner'
 
 function workId(doc) {
   return `book-${doc.key}`
@@ -50,15 +51,10 @@ export default function ReadHeader({ onAdd, existingIds }) {
   }
 
   return (
-    <header className="marquee">
-      <p className="marquee-eyebrow">Library card · now lending</p>
-      <h1 className="marquee-title">On The Shelf</h1>
-      <p className="marquee-sub">
-        Your reading list, catalogued. Search a title to check it out, filter by genre or
-        status.
-      </p>
+    <>
+      <HeroBanner title="Read" />
 
-      <div className="box-office">
+      <div className="search-bar">
         <input
           type="text"
           value={query}
@@ -66,7 +62,7 @@ export default function ReadHeader({ onAdd, existingIds }) {
           placeholder="Search for a book or author…"
           aria-label="Search for a book to add"
         />
-        <span className="box-office-label">Catalogue</span>
+        <span className="search-bar-label">Search</span>
 
         {(status === 'loading' || status === 'error' || results.length > 0) && (
           <div className="results-panel" role="listbox">
@@ -112,6 +108,6 @@ export default function ReadHeader({ onAdd, existingIds }) {
           </div>
         )}
       </div>
-    </header>
+    </>
   )
 }

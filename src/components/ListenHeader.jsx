@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchBooks, coverUrl } from '../api/openLibrary'
+import HeroBanner from './HeroBanner'
 
 function audioId(doc) {
   return `audio-${doc.key}`
@@ -69,15 +70,10 @@ export default function ListenHeader({ onAdd, existingIds }) {
   }
 
   return (
-    <header className="marquee">
-      <p className="marquee-eyebrow">Now playing · queue</p>
-      <h1 className="marquee-title">Now Playing</h1>
-      <p className="marquee-sub">
-        Audiobooks and anything else worth queueing up — podcast episodes, single tracks,
-        whatever doesn't fit a search box gets added by hand.
-      </p>
+    <>
+      <HeroBanner title="Listen" />
 
-      <div className="box-office">
+      <div className="search-bar">
         <input
           type="text"
           value={query}
@@ -85,7 +81,7 @@ export default function ListenHeader({ onAdd, existingIds }) {
           placeholder="Search for an audiobook…"
           aria-label="Search for an audiobook to add"
         />
-        <span className="box-office-label">Queue</span>
+        <span className="search-bar-label">Search</span>
 
         {(status === 'loading' || status === 'error' || results.length > 0) && (
           <div className="results-panel" role="listbox">
@@ -130,7 +126,7 @@ export default function ListenHeader({ onAdd, existingIds }) {
       </div>
 
       <button className="custom-add-toggle" onClick={() => setShowCustomForm((v) => !v)}>
-        {showCustomForm ? '× Cancel' : '+ Add a podcast episode or something else'}
+        {showCustomForm ? '× Cancel' : '+ Add manually'}
       </button>
 
       {showCustomForm && (
@@ -159,6 +155,6 @@ export default function ListenHeader({ onAdd, existingIds }) {
           </button>
         </form>
       )}
-    </header>
+    </>
   )
 }

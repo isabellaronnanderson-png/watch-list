@@ -51,7 +51,7 @@ export default function FilterBar({
         <span className="filter-group-label">Genre</span>
         <div className="chip-row">
           {allGenres.length === 0 && (
-            <span className="stub-admit">Add titles to populate genres</span>
+            <span className="filter-hint">Add titles to populate genres</span>
           )}
           {allGenres.map((g) => (
             <button

@@ -31,6 +31,12 @@ export const READ_STATUSES = [
   { id: 'read', label: 'Read' },
 ]
 
+export const LISTEN_STATUSES = [
+  { id: 'want', label: 'Want to listen' },
+  { id: 'listening', label: 'Listening' },
+  { id: 'listened', label: 'Listened' },
+]
+
 export const MEDIA_TYPES = [
   { id: 'movie', label: 'Films' },
   { id: 'tv', label: 'TV Shows' },

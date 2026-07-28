@@ -3,11 +3,11 @@ import TicketCard from './TicketCard'
 export function EmptyState({ hasAnyItems }) {
   return (
     <div className="empty-state">
-      <h2>{hasAnyItems ? 'No tickets match the reel' : 'The house is empty'}</h2>
+      <h2>{hasAnyItems ? 'No titles match' : 'Nothing here yet'}</h2>
       <p>
         {hasAnyItems
           ? 'Try clearing a filter — nothing in your watchlist fits this combination yet.'
-          : 'Search above to print your first ticket and start the reel.'}
+          : 'Search above to add your first title.'}
       </p>
     </div>
   )
@@ -15,7 +15,7 @@ export function EmptyState({ hasAnyItems }) {
 
 export default function TicketGrid({ items, onSetStatus, onRemove }) {
   return (
-    <div className="ticket-grid">
+    <div className="media-grid">
       {items.map((item) => (
         <TicketCard key={item.id} item={item} onSetStatus={onSetStatus} onRemove={onRemove} />
       ))}

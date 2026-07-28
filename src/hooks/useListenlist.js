@@ -2,10 +2,20 @@ import { useCallback, useEffect, useState } from 'react'
 
 const STORAGE_KEY = 'marquee-watchlist:listen'
 
+function migrateItem(item) {
+  const migrated = { ...item }
+  if (!migrated.status) {
+    migrated.status = migrated.listened ? 'listened' : 'want'
+  }
+  delete migrated.listened
+  return migrated
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : []
+    if (!raw) return []
+    return JSON.parse(raw).map(migrateItem)
   } catch {
     return []
   }
@@ -21,7 +31,7 @@ export function useListenlist() {
   const addItem = useCallback((item) => {
     setItems((prev) => {
       if (item.id && prev.some((p) => p.id === item.id)) return prev
-      return [{ ...item, listened: false, addedAt: Date.now() }, ...prev]
+      return [{ ...item, status: 'want', addedAt: Date.now() }, ...prev]
     })
   }, [])
 
@@ -29,11 +39,9 @@ export function useListenlist() {
     setItems((prev) => prev.filter((p) => p.id !== id))
   }, [])
 
-  const toggleListened = useCallback((id) => {
-    setItems((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, listened: !p.listened } : p))
-    )
+  const setStatus = useCallback((id, status) => {
+    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
   }, [])
 
-  return { items, addItem, removeItem, toggleListened }
+  return { items, addItem, removeItem, setStatus }
 }

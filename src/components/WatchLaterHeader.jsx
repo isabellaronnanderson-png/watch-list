@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { fetchVideoMeta } from '../api/youtube'
+import HeroBanner from './HeroBanner'
 
 export default function WatchLaterHeader({ onAdd, existingIds }) {
   const [url, setUrl] = useState('')
@@ -28,27 +29,24 @@ export default function WatchLaterHeader({ onAdd, existingIds }) {
   }
 
   return (
-    <header className="marquee">
-      <p className="marquee-eyebrow">Reel to reel · queued up</p>
-      <h1 className="marquee-title">Watch Later</h1>
-      <p className="marquee-sub">
-        Paste a link to any long-form video you want to get to eventually — no search, just
-        drop it in.
-      </p>
+    <>
+      <HeroBanner title="YouTube" />
 
-      <form className="box-office" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="Paste a YouTube link…"
-          aria-label="Paste a YouTube link to add"
-        />
-        <button type="submit" className="box-office-submit" disabled={status === 'loading'}>
-          {status === 'loading' ? 'Adding…' : 'Add'}
-        </button>
+      <form className="search-bar" onSubmit={handleSubmit}>
+        <div className="search-bar-row">
+          <input
+            type="text"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="Paste a YouTube link…"
+            aria-label="Paste a YouTube link to add"
+          />
+          <button type="submit" className="search-bar-submit" disabled={status === 'loading'}>
+            {status === 'loading' ? 'Adding…' : 'Add'}
+          </button>
+        </div>
       </form>
       {status === 'error' && <p className="results-error">{errorMsg}</p>}
-    </header>
+    </>
   )
 }

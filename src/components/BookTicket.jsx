@@ -6,9 +6,9 @@ const LABELS = { want: 'Want', reading: 'Reading', read: 'Read' }
 
 export default function BookTicket({ item, onSetStatus, onRemove }) {
   return (
-    <article className={`ticket${item.status === 'read' ? ' is-done' : ''}`}>
+    <article className={`media-card${item.status === 'read' ? ' is-done' : ''}`}>
       <button
-        className="ticket-remove"
+        className="media-card-remove"
         onClick={() => onRemove(item.id)}
         aria-label={`Remove ${item.title} from reading list`}
         title="Remove"
@@ -16,30 +16,29 @@ export default function BookTicket({ item, onSetStatus, onRemove }) {
         ×
       </button>
 
-      <div className="ticket-main">
+      <div className="media-card-cover">
         {item.coverId ? (
-          <img className="ticket-poster" src={coverUrl(item.coverId, 'M')} alt="" />
+          <img
+            src={coverUrl(item.coverId, 'M')}
+            alt=""
+            style={{ objectPosition: 'center 15%' }}
+          />
         ) : (
-          <div className="ticket-poster" />
+          <div className="media-card-cover-empty" />
         )}
-        <div className="ticket-body">
-          <span className="ticket-kind">Book</span>
-          <h3 className="ticket-title">{item.title}</h3>
-          <span className="ticket-year">
-            {item.author}
-            {item.year ? ` · ${item.year}` : ''}
-          </span>
-          {item.genres?.length > 0 && (
-            <span className="ticket-genres">{item.genres.slice(0, 3).join(' · ')}</span>
-          )}
-        </div>
       </div>
 
-      <div className="ticket-divider" />
-
-      <div className="ticket-stub">
-        <span className="stub-admit">Library&nbsp;Card</span>
-        <span className="stub-runtime">{formatPages(item.pageCount)}</span>
+      <div className="media-card-body">
+        <div className="media-card-meta-row">
+          <span className="media-card-kind">Book</span>
+          {item.year && <span className="media-card-year">{item.year}</span>}
+        </div>
+        <h3 className="media-card-title">{item.title}</h3>
+        <p className="media-card-sub">{item.author}</p>
+        {item.genres?.length > 0 && (
+          <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
+        )}
+        <span className="media-card-runtime">{formatPages(item.pageCount)}</span>
         <StatusStub
           statuses={READ_STATUSES}
           status={item.status}

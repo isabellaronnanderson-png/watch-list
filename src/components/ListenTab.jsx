@@ -2,22 +2,33 @@ import { useMemo, useState } from 'react'
 import ListenHeader from './ListenHeader'
 import ListenTile from './ListenTile'
 import { useListenlist } from '../hooks/useListenlist'
+import { LISTEN_STATUSES } from '../utils/format'
+
+const EMPTY_FILTERS = { statuses: new Set() }
 
 export default function ListenTab() {
-  const { items, addItem, removeItem, toggleListened } = useListenlist()
-  const [status, setStatus] = useState('all')
+  const { items, addItem, removeItem, setStatus } = useListenlist()
+  const [filters, setFilters] = useState(EMPTY_FILTERS)
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
 
+  function toggleStatus(s) {
+    setFilters((prev) => {
+      const next = new Set(prev.statuses)
+      if (next.has(s)) next.delete(s)
+      else next.add(s)
+      return { ...prev, statuses: next }
+    })
+  }
+
   const visibleItems = useMemo(() => {
     return items
-      .filter((item) => {
-        if (status === 'queued' && item.listened) return false
-        if (status === 'listened' && !item.listened) return false
-        return true
-      })
+      .filter((item) => filters.statuses.size === 0 || filters.statuses.has(item.status))
       .sort((a, b) => b.addedAt - a.addedAt)
-  }, [items, status])
+  }, [items, filters])
+
+  const listeningItems = visibleItems.filter((i) => i.status === 'listening')
+  const restItems = visibleItems.filter((i) => i.status !== 'listening')
 
   return (
     <>
@@ -27,44 +38,56 @@ export default function ListenTab() {
         <div className="filter-group">
           <span className="filter-group-label">Status</span>
           <div className="chip-row">
-            {[
-              { id: 'all', label: 'All' },
-              { id: 'queued', label: 'Queued' },
-              { id: 'listened', label: 'Listened' },
-            ].map((s) => (
+            {LISTEN_STATUSES.map((s) => (
               <button
                 key={s.id}
                 className="chip"
-                aria-pressed={status === s.id}
-                onClick={() => setStatus(s.id)}
+                aria-pressed={filters.statuses.has(s.id)}
+                onClick={() => toggleStatus(s.id)}
               >
                 {s.label}
               </button>
             ))}
           </div>
         </div>
+        {filters.statuses.size > 0 && (
+          <button className="filter-clear" onClick={() => setFilters(EMPTY_FILTERS)}>
+            Clear filters
+          </button>
+        )}
       </div>
 
+      {listeningItems.length > 0 && (
+        <>
+          <p className="section-heading section-heading-highlight">
+            Currently listening · {listeningItems.length}
+          </p>
+          <div className="media-grid">
+            {listeningItems.map((item) => (
+              <ListenTile key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
+            ))}
+          </div>
+          <div className="section-divider" />
+        </>
+      )}
+
       <p className="section-heading">
-        {visibleItems.length} item{visibleItems.length === 1 ? '' : 's'} in the queue
+        {restItems.length} item{restItems.length === 1 ? '' : 's'} in the queue
       </p>
 
-      {visibleItems.length > 0 ? (
-        <div className="listen-grid">
-          {visibleItems.map((item) => (
-            <ListenTile
-              key={item.id}
-              item={item}
-              onToggleListened={toggleListened}
-              onRemove={removeItem}
-            />
+      {restItems.length > 0 ? (
+        <div className="media-grid">
+          {restItems.map((item) => (
+            <ListenTile key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
           ))}
         </div>
       ) : (
-        <div className="empty-state">
-          <h2>Nothing queued up</h2>
-          <p>Search for an audiobook above, or add a podcast episode by hand.</p>
-        </div>
+        listeningItems.length === 0 && (
+          <div className="empty-state">
+            <h2>Nothing queued up</h2>
+            <p>Search for an audiobook above, or add a podcast episode by hand.</p>
+          </div>
+        )
       )}
     </>
   )

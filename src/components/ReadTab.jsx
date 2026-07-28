@@ -73,7 +73,7 @@ export default function ReadTab() {
           <span className="filter-group-label">Genre</span>
           <div className="chip-row">
             {allGenres.length === 0 && (
-              <span className="stub-admit">Add books to populate genres</span>
+              <span className="filter-hint">Add books to populate genres</span>
             )}
             {allGenres.map((g) => (
               <button
@@ -112,7 +112,7 @@ export default function ReadTab() {
           <p className="section-heading section-heading-highlight">
             Currently reading · {readingItems.length}
           </p>
-          <div className="ticket-grid">
+          <div className="media-grid">
             {readingItems.map((item) => (
               <BookTicket key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
             ))}
@@ -126,7 +126,7 @@ export default function ReadTab() {
       </p>
 
       {restItems.length > 0 ? (
-        <div className="ticket-grid">
+        <div className="media-grid">
           {restItems.map((item) => (
             <BookTicket key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
           ))}
