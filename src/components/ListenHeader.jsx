@@ -1,10 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { searchBooks, coverUrl } from '../api/openLibrary'
+import { searchBooks } from '../api/googleBooks'
 import HeroBanner from './HeroBanner'
-
-function audioId(doc) {
-  return `audio-${doc.key}`
-}
 
 export default function ListenHeader({ onAdd, existingIds }) {
   const [query, setQuery] = useState('')
@@ -28,8 +24,8 @@ export default function ListenHeader({ onAdd, existingIds }) {
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
       try {
-        const docs = await searchBooks(query)
-        setResults(docs.slice(0, 8))
+        const books = await searchBooks(query)
+        setResults(books)
         setStatus('idle')
       } catch (err) {
         setErrorMsg(err.message)
@@ -39,18 +35,16 @@ export default function ListenHeader({ onAdd, existingIds }) {
     return () => clearTimeout(debounceRef.current)
   }, [query])
 
-  function handleAddAudiobook(doc) {
+  function handleAddAudiobook(book) {
     onAdd({
-      id: audioId(doc),
+      id: `audio-${book.id}`,
       kind: 'audiobook',
-      workKey: doc.key,
-      title: doc.title,
-      author: doc.author_name?.[0] || 'Unknown author',
-      coverId: doc.cover_i || null,
-      year: doc.first_publish_year || null,
+      title: book.title,
+      author: book.author,
+      coverUrl: book.coverUrl,
+      year: book.year,
     })
-    setQuery('')
-    setResults([])
+    // Results list stays open so multiple audiobooks (e.g. a series) can be added in a row.
   }
 
   function handleAddCustom(e) {
@@ -88,8 +82,8 @@ export default function ListenHeader({ onAdd, existingIds }) {
             {status === 'loading' && <p className="results-status">Searching…</p>}
             {status === 'error' && <p className="results-error">{errorMsg}</p>}
             {status !== 'loading' &&
-              results.map((doc) => {
-                const id = audioId(doc)
+              results.map((book) => {
+                const id = `audio-${book.id}`
                 const already = existingIds.has(id)
                 return (
                   <div
@@ -97,22 +91,22 @@ export default function ListenHeader({ onAdd, existingIds }) {
                     key={id}
                     role="button"
                     tabIndex={already ? -1 : 0}
-                    onClick={() => !already && handleAddAudiobook(doc)}
+                    onClick={() => !already && handleAddAudiobook(book)}
                     onKeyDown={(e) => {
                       if (!already && (e.key === 'Enter' || e.key === ' ')) {
                         e.preventDefault()
-                        handleAddAudiobook(doc)
+                        handleAddAudiobook(book)
                       }
                     }}
                   >
-                    {doc.cover_i ? (
-                      <img src={coverUrl(doc.cover_i, 'S')} alt="" />
+                    {book.coverUrl ? (
+                      <img src={book.coverUrl} alt="" />
                     ) : (
-                      <div style={{ width: 34, height: 51, background: 'var(--paper-shadow)' }} />
+                      <div style={{ width: 34, height: 51, background: 'var(--surface-alt)' }} />
                     )}
                     <div className="result-info">
-                      <div className="result-title">{doc.title}</div>
-                      <div className="result-meta">{doc.author_name?.[0] || 'Unknown author'}</div>
+                      <div className="result-title">{book.title}</div>
+                      <div className="result-meta">{book.author}</div>
                     </div>
                     <span className="result-add">{already ? 'Added' : 'Add'}</span>
                   </div>

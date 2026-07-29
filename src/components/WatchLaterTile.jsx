@@ -1,4 +1,4 @@
-import { WATCH_STATUSES } from '../utils/format'
+import { WATCH_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 
 const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
@@ -20,10 +20,14 @@ export default function WatchLaterTile({ item, onSetStatus, onRemove }) {
         <span className="media-card-play">▶</span>
       </a>
 
+      <div className="media-card-perforation" />
+
       <div className="media-card-body">
         <span className="media-card-kind">YouTube</span>
         <h3 className="media-card-title">{item.title}</h3>
         {item.channel && <p className="media-card-sub">{item.channel}</p>}
+        <div className="media-card-barcode" />
+        <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
         <StatusStub
           statuses={WATCH_STATUSES}
           status={item.status}

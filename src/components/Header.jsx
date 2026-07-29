@@ -68,8 +68,7 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
         providerIds: canonicalProviderIds,
         numberOfSeasons: mediaType === 'tv' ? details.numberOfSeasons : null,
       })
-      setQuery('')
-      setResults([])
+      // Results list stays open so multiple titles (e.g. a series) can be added in a row.
     } catch (err) {
       setErrorMsg(err.message)
       setStatus('error')

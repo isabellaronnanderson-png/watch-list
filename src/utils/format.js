@@ -46,3 +46,30 @@ export function yearFromDate(dateStr) {
   if (!dateStr) return null
   return dateStr.slice(0, 4)
 }
+
+// Deterministic-looking 5-digit "ticket number" derived from an item's id, purely decorative.
+export function ticketNumber(id) {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash * 31 + id.charCodeAt(i)) >>> 0
+  }
+  return String(hash % 100000).padStart(5, '0')
+}
+
+export const GAME_STATUSES = [
+  { id: 'want', label: 'Want to play' },
+  { id: 'playing', label: 'Playing' },
+  { id: 'played', label: 'Played' },
+]
+
+export const LENGTH_BUCKETS = [
+  { id: 'short', label: 'Under 10h', test: (h) => h != null && h < 10 },
+  { id: 'medium', label: '10–30h', test: (h) => h != null && h >= 10 && h < 30 },
+  { id: 'long', label: '30–60h', test: (h) => h != null && h >= 30 && h < 60 },
+  { id: 'epic', label: '60h+', test: (h) => h != null && h >= 60 },
+]
+
+export const GAME_MODES = [
+  { id: 'singleplayer', label: 'Singleplayer' },
+  { id: 'multiplayer', label: 'Multiplayer' },
+]

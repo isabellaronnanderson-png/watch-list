@@ -1,19 +1,23 @@
-# A media tracker: Watch, Read, Listen, YouTube
+# A media tracker: Watch, Read, Listen, YouTube, Games
 
-A clean, white, minimal media tracker across four tabs — **Watch**, **Read**, **Listen**,
-**YouTube** — each with its own accent color, its own search, and its own status tracking
-(Want → In progress → Done). Each tab opens with an original "wall of spines" banner
-illustration (built in CSS, not a photo) tinted to that tab's accent color, with the tab
-name centered on top.
+A clean, white, monochrome media tracker across five tabs, each opening with an original
+grayscale "wall of spines" banner illustration (built in SVG, not a photo) with the tab
+name centered on top. Cards are styled like modern movie tickets — full uncropped
+cover art, a dashed perforation line, a barcode graphic, and a ticket number — used
+consistently across every tab.
 
-- **Watch**: TMDB search, genre/runtime/type/streaming-service filters, status per title
-  (want to watch / watching / watched).
-- **Read**: Open Library search (no API key needed), genre filter, status per book.
-- **Listen**: audiobooks via Open Library, rendered as the same square cards as everything
-  else; anything without a good API (podcast episodes, one-offs) gets added through a
-  manual form instead. Same status tracking as Read.
+- **Watch**: TMDB search, genre/runtime/type/streaming-service filters, status per title.
+- **Read**: Google Books search (English-preferred titles, clean categories), genre filter.
+- **Listen**: audiobooks via Google Books, on the same ticket design as everything else;
+  anything without a good API (podcast episodes, one-offs) gets added through a manual
+  form instead.
 - **YouTube**: paste any link and it pulls the title/channel/thumbnail via YouTube's free
-  oEmbed endpoint (no API key). Same status tracking as Watch.
+  oEmbed endpoint (no API key).
+- **Games**: RAWG search, with filters for console/platform, genre, length (estimated
+  playtime), and singleplayer/multiplayer.
+
+All five tabs share the same Want → In Progress → Done status tracking, with an "in
+progress" section surfaced above the rest of the list.
 
 ## Setup
 
@@ -21,14 +25,16 @@ name centered on top.
    ```bash
    npm install
    ```
-2. Copy the env file and add your TMDB key (only needed for the Watch tab — Read and
-   Listen use Open Library, which requires no key):
+2. Copy the env file and add your keys:
    ```bash
    cp .env.example .env
    ```
    Open `.env` and set:
-   - `VITE_TMDB_API_KEY` — your TMDB v3 API key (from https://www.themoviedb.org/settings/api)
+   - `VITE_TMDB_API_KEY` — your TMDB v3 API key (from https://www.themoviedb.org/settings/api) — only used by the Watch tab
    - `VITE_TMDB_REGION` — two-letter region code for streaming availability, e.g. `GB`, `SE`, `US`
+   - `VITE_RAWG_API_KEY` — a free key from https://rawg.io/apidocs — only used by the Games tab
+
+   Read, Listen, and YouTube need no API key at all.
 
 3. Run it locally:
    ```bash

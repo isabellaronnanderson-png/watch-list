@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { searchBooks } from '../api/googleBooks'
+import { searchGames, getGameDetails } from '../api/rawg'
+import { yearFromDate } from '../utils/format'
 import HeroBanner from './HeroBanner'
 
-export default function ReadHeader({ onAdd, existingIds }) {
+export default function GamesHeader({ onAdd, existingIds }) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
   const [status, setStatus] = useState('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [addingId, setAddingId] = useState(null)
   const debounceRef = useRef(null)
 
   useEffect(() => {
@@ -19,8 +21,8 @@ export default function ReadHeader({ onAdd, existingIds }) {
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
       try {
-        const books = await searchBooks(query)
-        setResults(books)
+        const games = await searchGames(query)
+        setResults(games)
         setStatus('idle')
       } catch (err) {
         setErrorMsg(err.message)
@@ -30,31 +32,41 @@ export default function ReadHeader({ onAdd, existingIds }) {
     return () => clearTimeout(debounceRef.current)
   }, [query])
 
-  function handleAdd(book) {
-    const id = `book-${book.id}`
-    onAdd({
-      id,
-      title: book.title,
-      author: book.author,
-      year: book.year,
-      coverUrl: book.coverUrl,
-      pageCount: book.pageCount,
-      genres: book.genres,
-    })
-    // Results list stays open so multiple books (e.g. a series) can be added in a row.
+  async function handleAdd(game) {
+    const id = `game-${game.id}`
+    setAddingId(id)
+    try {
+      const details = await getGameDetails(game.id)
+      onAdd({
+        id,
+        title: game.name,
+        year: yearFromDate(game.released),
+        coverUrl: game.background_image || null,
+        genres: details.genres,
+        platforms: details.platforms,
+        playtimeHours: details.playtimeHours,
+        modes: details.modes,
+      })
+      // Results list stays open so multiple games can be added in a row.
+    } catch (err) {
+      setErrorMsg(err.message)
+      setStatus('error')
+    } finally {
+      setAddingId(null)
+    }
   }
 
   return (
     <>
-      <HeroBanner title="Read" />
+      <HeroBanner title="Games" />
 
       <div className="search-bar">
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search for a book or author…"
-          aria-label="Search for a book to add"
+          placeholder="Search for a video game…"
+          aria-label="Search for a video game to add"
         />
         <span className="search-bar-label">Search</span>
 
@@ -63,36 +75,38 @@ export default function ReadHeader({ onAdd, existingIds }) {
             {status === 'loading' && <p className="results-status">Searching…</p>}
             {status === 'error' && <p className="results-error">{errorMsg}</p>}
             {status !== 'loading' &&
-              results.map((book) => {
-                const id = `book-${book.id}`
+              results.map((game) => {
+                const id = `game-${game.id}`
                 const already = existingIds.has(id)
+                const disabled = already || addingId === id
                 return (
                   <div
-                    className={`result-row${already ? ' is-disabled' : ''}`}
+                    className={`result-row${disabled ? ' is-disabled' : ''}`}
                     key={id}
                     role="button"
-                    tabIndex={already ? -1 : 0}
-                    onClick={() => !already && handleAdd(book)}
+                    tabIndex={disabled ? -1 : 0}
+                    onClick={() => !disabled && handleAdd(game)}
                     onKeyDown={(e) => {
-                      if (!already && (e.key === 'Enter' || e.key === ' ')) {
+                      if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
                         e.preventDefault()
-                        handleAdd(book)
+                        handleAdd(game)
                       }
                     }}
                   >
-                    {book.coverUrl ? (
-                      <img src={book.coverUrl} alt="" />
+                    {game.background_image ? (
+                      <img src={game.background_image} alt="" style={{ height: 51, width: 68, objectFit: 'cover' }} />
                     ) : (
-                      <div style={{ width: 34, height: 51, background: 'var(--surface-alt)' }} />
+                      <div style={{ width: 68, height: 51, background: 'var(--surface-alt)' }} />
                     )}
                     <div className="result-info">
-                      <div className="result-title">{book.title}</div>
+                      <div className="result-title">{game.name}</div>
                       <div className="result-meta">
-                        {book.author}
-                        {book.year ? ` · ${book.year}` : ''}
+                        {yearFromDate(game.released) || 'Unreleased'}
                       </div>
                     </div>
-                    <span className="result-add">{already ? 'Added' : 'Add'}</span>
+                    <span className="result-add">
+                      {already ? 'Added' : addingId === id ? 'Adding…' : 'Add'}
+                    </span>
                   </div>
                 )
               })}

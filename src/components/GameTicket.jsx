@@ -1,25 +1,24 @@
-import { posterUrl } from '../api/tmdb'
-import { formatRuntime, WATCH_STATUSES, ticketNumber } from '../utils/format'
-import { providerLabel } from '../utils/providers'
+import { GAME_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 
-const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
+const LABELS = { want: 'Want', playing: 'Playing', played: 'Played' }
+const MODE_LABELS = { singleplayer: 'Singleplayer', multiplayer: 'Multiplayer' }
 
-export default function TicketCard({ item, onSetStatus, onRemove }) {
+export default function GameTicket({ item, onSetStatus, onRemove }) {
   return (
-    <article className={`media-card${item.status === 'watched' ? ' is-done' : ''}`}>
+    <article className={`media-card${item.status === 'played' ? ' is-done' : ''}`}>
       <button
         className="media-card-remove"
         onClick={() => onRemove(item.id)}
-        aria-label={`Remove ${item.title} from watchlist`}
+        aria-label={`Remove ${item.title} from games list`}
         title="Remove"
       >
         ×
       </button>
 
       <div className="media-card-cover">
-        {item.posterPath ? (
-          <img src={posterUrl(item.posterPath, 'w342')} alt="" />
+        {item.coverUrl ? (
+          <img src={item.coverUrl} alt="" />
         ) : (
           <div className="media-card-cover-empty" />
         )}
@@ -29,29 +28,34 @@ export default function TicketCard({ item, onSetStatus, onRemove }) {
 
       <div className="media-card-body">
         <div className="media-card-meta-row">
-          <span className="media-card-kind">{item.mediaType === 'tv' ? 'Series' : 'Feature'}</span>
+          <span className="media-card-kind">Game</span>
           {item.year && <span className="media-card-year">{item.year}</span>}
         </div>
         <h3 className="media-card-title">{item.title}</h3>
+        {item.platforms?.length > 0 && (
+          <p className="media-card-sub">{item.platforms.slice(0, 3).join(' · ')}</p>
+        )}
         {item.genres?.length > 0 && (
           <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
         )}
         <div className="media-card-providers">
-          {item.providerIds?.length > 0 ? (
-            item.providerIds.map((pid) => (
-              <span key={pid} className="provider-stamp">
-                {providerLabel(pid)}
+          {item.modes?.length > 0 ? (
+            item.modes.map((m) => (
+              <span key={m} className="provider-stamp">
+                {MODE_LABELS[m] || m}
               </span>
             ))
           ) : (
-            <span className="media-card-providers-empty">Not streaming</span>
+            <span className="media-card-providers-empty">Mode unknown</span>
           )}
         </div>
-        <span className="media-card-runtime">{formatRuntime(item.runtimeMinutes)}</span>
+        <span className="media-card-runtime">
+          {item.playtimeHours ? `~${item.playtimeHours}H` : '— H'}
+        </span>
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
         <StatusStub
-          statuses={WATCH_STATUSES}
+          statuses={GAME_STATUSES}
           status={item.status}
           onSetStatus={(s) => onSetStatus(item.id, s)}
           labels={LABELS}

@@ -3,6 +3,7 @@ const TABS = [
   { id: 'read', label: 'Read' },
   { id: 'listen', label: 'Listen' },
   { id: 'watchlater', label: 'YouTube' },
+  { id: 'games', label: 'Games' },
 ]
 
 export default function TabNav({ active, onChange }) {
