@@ -1,9 +1,10 @@
 const BASE = 'https://www.googleapis.com/books/v1/volumes'
+const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
 
 /**
- * Search books via Google Books. No API key required for normal usage volumes
- * (Google allows unauthenticated requests at moderate volume); langRestrict
- * biases results toward English-language editions/titles.
+ * Search books via Google Books. Works without a key at a low, shared rate limit
+ * (easy to hit a 429 "too many requests"). Adding a free API key raises that limit
+ * substantially - see .env.example for where to get one.
  */
 export async function searchBooks(query) {
   if (!query || !query.trim()) return []
@@ -11,8 +12,18 @@ export async function searchBooks(query) {
   url.searchParams.set('q', query)
   url.searchParams.set('maxResults', '8')
   url.searchParams.set('langRestrict', 'en')
+  if (API_KEY) url.searchParams.set('key', API_KEY)
   const res = await fetch(url.toString())
-  if (!res.ok) throw new Error(`Book search failed (${res.status})`)
+  if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error(
+        API_KEY
+          ? 'Book search is rate-limited right now — try again shortly.'
+          : 'Book search is rate-limited. Add a free VITE_GOOGLE_BOOKS_API_KEY to .env to raise this limit.'
+      )
+    }
+    throw new Error(`Book search failed (${res.status})`)
+  }
   const data = await res.json()
   return (data.items || []).map(normalizeVolume)
 }
