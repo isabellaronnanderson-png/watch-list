@@ -407,6 +407,7 @@ input:focus-visible,
   position: relative;
   display: flex;
   flex-direction: column;
+  min-width: 0;
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -548,6 +549,7 @@ input:focus-visible,
   flex-direction: column;
   gap: 4px;
   flex: 1;
+  min-width: 0;
 }
 
 .media-card-meta-row {
