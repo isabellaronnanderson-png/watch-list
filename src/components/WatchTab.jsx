@@ -12,7 +12,7 @@ const EMPTY_FILTERS = {
   providers: new Set(),
   mediaTypes: new Set(),
   statuses: new Set(),
-  sort: 'added',
+  sort: 'title',
 }
 
 export default function WatchTab() {

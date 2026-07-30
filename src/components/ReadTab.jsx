@@ -4,7 +4,7 @@ import BookTicket from './BookTicket'
 import { useReadlist } from '../hooks/useReadlist'
 import { READ_STATUSES } from '../utils/format'
 
-const EMPTY_FILTERS = { genres: new Set(), statuses: new Set(), sort: 'added' }
+const EMPTY_FILTERS = { genres: new Set(), statuses: new Set(), sort: 'title' }
 
 export default function ReadTab() {
   const { items, addItem, removeItem, setStatus } = useReadlist()
@@ -112,7 +112,7 @@ export default function ReadTab() {
           <p className="section-heading section-heading-highlight">
             Currently reading · {readingItems.length}
           </p>
-          <div className="media-grid">
+          <div className="media-grid-h">
             {readingItems.map((item) => (
               <BookTicket key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
             ))}
@@ -126,7 +126,7 @@ export default function ReadTab() {
       </p>
 
       {restItems.length > 0 ? (
-        <div className="media-grid">
+        <div className="media-grid-h">
           {restItems.map((item) => (
             <BookTicket key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
           ))}

@@ -11,7 +11,7 @@ export default function ListenTile({ item, onSetStatus, onRemove }) {
     : null
 
   return (
-    <article className={`media-card${item.status === 'listened' ? ' is-done' : ''}`}>
+    <article className={`media-card media-card-h${item.status === 'listened' ? ' is-done' : ''}`}>
       <button
         className="media-card-remove"
         onClick={() => onRemove(item.id)}

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchGames, getGameDetails } from '../api/rawg'
 import { yearFromDate } from '../utils/format'
-import HeroBanner from './HeroBanner'
 
 export default function GamesHeader({ onAdd, existingIds }) {
   const [query, setQuery] = useState('')
@@ -58,7 +57,6 @@ export default function GamesHeader({ onAdd, existingIds }) {
 
   return (
     <>
-      <HeroBanner title="Games" />
 
       <div className="search-bar">
         <input

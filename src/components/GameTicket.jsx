@@ -16,7 +16,7 @@ export default function GameTicket({ item, onSetStatus, onRemove }) {
         ×
       </button>
 
-      <div className="media-card-cover">
+      <div className="media-card-cover media-card-cover-wide">
         {item.coverUrl ? (
           <img src={item.coverUrl} alt="" />
         ) : (

@@ -94,52 +94,37 @@ input:focus-visible,
   border-right-color: var(--accent);
 }
 
-/* ---------- Hero banner (shelf illustration) ---------- */
+/* ---------- Site header ---------- */
 
-.hero-banner {
-  position: relative;
-  height: 180px;
-  border-radius: 8px;
-  overflow: hidden;
-  margin: 36px 0 40px;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+.site-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 0 8px;
 }
 
-.hero-banner-shelf {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
+.site-logo {
+  width: 34px;
+  height: 34px;
+  color: var(--text);
+  flex-shrink: 0;
 }
 
-.hero-banner-title-card {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(255, 255, 255, 0.95);
-  padding: 16px 44px;
-  border-radius: 3px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-}
-
-.hero-banner-title-card h1 {
+.site-title {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(22px, 3.2vw, 32px);
+  font-size: 22px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--text);
   margin: 0;
-  text-align: center;
 }
 
 /* ---------- Search bar ---------- */
 
 .search-bar {
   position: relative;
-  margin: 0 0 28px;
+  margin: 32px 0 28px;
 }
 
 .search-bar-row {
@@ -412,6 +397,12 @@ input:focus-visible,
   gap: 32px 24px;
 }
 
+.media-grid-h {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+}
+
 .media-card {
   position: relative;
   display: flex;
@@ -430,6 +421,30 @@ input:focus-visible,
 
 .media-card.is-done {
   opacity: 0.5;
+}
+
+/* Horizontal variant: image sits on the side (like a classic ticket stub) - used
+   for Watch/Read/Listen, since posters and book covers are naturally tall. */
+.media-card-h {
+  flex-direction: row;
+}
+
+.media-card-h .media-card-cover {
+  width: 120px;
+  aspect-ratio: auto;
+  flex-shrink: 0;
+}
+
+.media-card-h .media-card-perforation {
+  height: auto;
+  align-self: stretch;
+  border-top: none;
+  border-left: 2px dashed var(--border);
+  margin: 14px 0;
+}
+
+.media-card-h .media-card-cover-fallback span {
+  font-size: 11px;
 }
 
 .media-card-cover {

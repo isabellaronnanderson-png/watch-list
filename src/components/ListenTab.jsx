@@ -62,7 +62,7 @@ export default function ListenTab() {
           <p className="section-heading section-heading-highlight">
             Currently listening · {listeningItems.length}
           </p>
-          <div className="media-grid">
+          <div className="media-grid-h">
             {listeningItems.map((item) => (
               <ListenTile key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
             ))}
@@ -76,7 +76,7 @@ export default function ListenTab() {
       </p>
 
       {restItems.length > 0 ? (
-        <div className="media-grid">
+        <div className="media-grid-h">
           {restItems.map((item) => (
             <ListenTile key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
           ))}

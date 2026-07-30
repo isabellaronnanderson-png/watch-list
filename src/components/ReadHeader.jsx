@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchBooks } from '../api/googleBooks'
-import HeroBanner from './HeroBanner'
 
 export default function ReadHeader({ onAdd, existingIds }) {
   const [query, setQuery] = useState('')
@@ -46,7 +45,6 @@ export default function ReadHeader({ onAdd, existingIds }) {
 
   return (
     <>
-      <HeroBanner title="Read" />
 
       <div className="search-bar">
         <input

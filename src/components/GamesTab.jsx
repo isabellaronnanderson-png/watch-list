@@ -10,7 +10,7 @@ const EMPTY_FILTERS = {
   platforms: new Set(),
   lengths: new Set(),
   modes: new Set(),
-  sort: 'added',
+  sort: 'title',
 }
 
 export default function GamesTab() {

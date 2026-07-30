@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import { searchTitles, getDetails, getWatchProviders, posterUrl } from '../api/tmdb'
 import { yearFromDate } from '../utils/format'
 import { canonicalizeProvider } from '../utils/providers'
-import HeroBanner from './HeroBanner'
 
 export default function Header({ onAdd, existingIds, genreMaps }) {
   const [query, setQuery] = useState('')
@@ -79,7 +78,6 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
 
   return (
     <>
-      <HeroBanner title="Watch" />
 
       <div className="search-bar">
         <input

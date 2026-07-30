@@ -10,7 +10,7 @@ export default function BookTicket({ item, onSetStatus, onRemove }) {
   const cover = item.coverUrl || (item.coverId ? openLibraryCoverUrl(item.coverId, 'M') : null)
 
   return (
-    <article className={`media-card${item.status === 'read' ? ' is-done' : ''}`}>
+    <article className={`media-card media-card-h${item.status === 'read' ? ' is-done' : ''}`}>
       <button
         className="media-card-remove"
         onClick={() => onRemove(item.id)}

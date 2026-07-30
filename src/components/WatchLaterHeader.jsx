@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { fetchVideoMeta } from '../api/youtube'
-import HeroBanner from './HeroBanner'
 
 export default function WatchLaterHeader({ onAdd, existingIds }) {
   const [url, setUrl] = useState('')
@@ -30,7 +29,6 @@ export default function WatchLaterHeader({ onAdd, existingIds }) {
 
   return (
     <>
-      <HeroBanner title="YouTube" />
 
       <form className="search-bar" onSubmit={handleSubmit}>
         <div className="search-bar-row">
