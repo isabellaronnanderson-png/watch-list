@@ -31,7 +31,11 @@ export default function ReadTab() {
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
-      if (filters.statuses.size > 0 && !filters.statuses.has(item.status)) return false
+      if (filters.statuses.size > 0) {
+        if (!filters.statuses.has(item.status)) return false
+      } else if (item.status === 'read') {
+        return false
+      }
       if (filters.genres.size > 0) {
         const hasGenre = item.genres?.some((g) => filters.genres.has(g))
         if (!hasGenre) return false

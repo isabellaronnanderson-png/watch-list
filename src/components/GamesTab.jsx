@@ -49,7 +49,11 @@ export default function GamesTab() {
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
-      if (filters.statuses.size > 0 && !filters.statuses.has(item.status)) return false
+      if (filters.statuses.size > 0) {
+        if (!filters.statuses.has(item.status)) return false
+      } else if (item.status === 'played') {
+        return false
+      }
       if (filters.genres.size > 0 && !item.genres?.some((g) => filters.genres.has(g))) return false
       if (filters.platforms.size > 0 && !item.platforms?.some((p) => filters.platforms.has(p)))
         return false

@@ -32,18 +32,22 @@ async function fetchWithRetry(url, attempt = 0) {
 /**
  * Search books via Google Books. Returns results in Google's own relevance order,
  * with no language filtering or bias - any edition/language Google surfaces is fair game.
+ * Filters out items with no ISBN (a decent proxy for academic papers/theses/other
+ * non-trade-published clutter, which almost never carry one) and restricts to
+ * printType=books to exclude magazines/journals.
  */
 export async function searchBooks(query) {
   if (!query || !query.trim()) return []
   const url = new URL(BASE)
   url.searchParams.set('q', query)
-  url.searchParams.set('maxResults', '20')
+  url.searchParams.set('maxResults', '40')
+  url.searchParams.set('printType', 'books')
   if (API_KEY) url.searchParams.set('key', API_KEY)
 
   const data = await fetchWithRetry(url.toString())
-  const items = (data.items || []).map(normalizeVolume)
+  const items = (data.items || []).map(normalizeVolume).filter((b) => b.hasIsbn)
 
-  return items.slice(0, 10)
+  return items
 }
 
 function normalizeVolume(item) {
@@ -58,6 +62,9 @@ function normalizeVolume(item) {
     pageCount: info.pageCount || null,
     genres: parseCategories(info.categories),
     language: info.language || null,
+    hasIsbn: (info.industryIdentifiers || []).some(
+      (id) => id.type === 'ISBN_10' || id.type === 'ISBN_13'
+    ),
   }
 }
 

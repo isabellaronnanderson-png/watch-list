@@ -2,10 +2,13 @@ import { posterUrl } from '../api/tmdb'
 import { formatRuntime, WATCH_STATUSES, ticketNumber } from '../utils/format'
 import { providerLabel } from '../utils/providers'
 import StatusStub from './StatusStub'
+import SeasonStatusControl from './SeasonStatusControl'
 
 const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
 
-export default function TicketCard({ item, onSetStatus, onRemove }) {
+export default function TicketCard({ item, onSetStatus, onToggleSeason, onRemove }) {
+  const isTv = item.mediaType === 'tv' && Array.isArray(item.seasons) && item.seasons.length > 0
+
   return (
     <article className={`media-card media-card-h${item.status === 'watched' ? ' is-done' : ''}`}>
       <button
@@ -50,12 +53,19 @@ export default function TicketCard({ item, onSetStatus, onRemove }) {
         <span className="media-card-runtime">{formatRuntime(item.runtimeMinutes)}</span>
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
-        <StatusStub
-          statuses={WATCH_STATUSES}
-          status={item.status}
-          onSetStatus={(s) => onSetStatus(item.id, s)}
-          labels={LABELS}
-        />
+        {isTv ? (
+          <SeasonStatusControl
+            seasons={item.seasons}
+            onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
+          />
+        ) : (
+          <StatusStub
+            statuses={WATCH_STATUSES}
+            status={item.status}
+            onSetStatus={(s) => onSetStatus(item.id, s)}
+            labels={LABELS}
+          />
+        )}
       </div>
     </article>
   )

@@ -41,6 +41,9 @@ export default function ListenTile({ item, onSetStatus, onRemove }) {
         ) : (
           item.subtitle && <p className="media-card-sub">{item.subtitle}</p>
         )}
+        {isAudiobook && item.genres?.length > 0 && (
+          <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
+        )}
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
         <StatusStub

@@ -42,6 +42,7 @@ export default function ListenHeader({ onAdd, existingIds }) {
       author: book.author,
       coverUrl: book.coverUrl,
       year: book.year,
+      genres: book.genres,
     })
     // Results list stays open so multiple audiobooks (e.g. a series) can be added in a row.
   }

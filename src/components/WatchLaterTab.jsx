@@ -4,7 +4,7 @@ import WatchLaterTile from './WatchLaterTile'
 import { useWatchLater } from '../hooks/useWatchLater'
 import { WATCH_STATUSES } from '../utils/format'
 
-const EMPTY_FILTERS = { statuses: new Set() }
+const EMPTY_FILTERS = { statuses: new Set(), sort: 'title' }
 
 export default function WatchLaterTab() {
   const { items, addItem, removeItem, setStatus } = useWatchLater()
@@ -22,9 +22,15 @@ export default function WatchLaterTab() {
   }
 
   const visibleItems = useMemo(() => {
-    return items
-      .filter((item) => filters.statuses.size === 0 || filters.statuses.has(item.status))
-      .sort((a, b) => b.addedAt - a.addedAt)
+    let list = items.filter((item) => {
+      if (filters.statuses.size > 0) return filters.statuses.has(item.status)
+      return item.status !== 'watched'
+    })
+    list = [...list].sort((a, b) => {
+      if (filters.sort === 'title') return a.title.localeCompare(b.title)
+      return b.addedAt - a.addedAt
+    })
+    return list
   }, [items, filters])
 
   const watchingItems = visibleItems.filter((i) => i.status === 'watching')
@@ -50,6 +56,19 @@ export default function WatchLaterTab() {
             ))}
           </div>
         </div>
+
+        <div className="filter-group">
+          <span className="filter-group-label">Sort</span>
+          <select
+            className="filter-select"
+            value={filters.sort}
+            onChange={(e) => setFilters((prev) => ({ ...prev, sort: e.target.value }))}
+          >
+            <option value="added">Recently added</option>
+            <option value="title">Title A–Z</option>
+          </select>
+        </div>
+
         {filters.statuses.size > 0 && (
           <button className="filter-clear" onClick={() => setFilters(EMPTY_FILTERS)}>
             Clear filters

@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Header from './Header'
 import FilterBar from './FilterBar'
 import TicketGrid, { EmptyState } from './TicketGrid'
 import { useWatchlist } from '../hooks/useWatchlist'
-import { getGenreMaps } from '../api/tmdb'
+import { getGenreMaps, getDetails } from '../api/tmdb'
 import { RUNTIME_BUCKETS } from '../utils/format'
 
 const EMPTY_FILTERS = {
@@ -16,15 +16,37 @@ const EMPTY_FILTERS = {
 }
 
 export default function WatchTab() {
-  const { items, addItem, removeItem, setStatus } = useWatchlist()
+  const { items, addItem, removeItem, setStatus, toggleSeason, updateSeasonCount } = useWatchlist()
   const [genreMaps, setGenreMaps] = useState(null)
   const [configError, setConfigError] = useState(null)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
+  const checkedForNewSeasons = useRef(false)
 
   useEffect(() => {
     getGenreMaps()
       .then(setGenreMaps)
       .catch((err) => setConfigError(err.message))
+  }, [])
+
+  // Once per app load, quietly re-check TMDB for TV shows to see if a new season
+  // has aired since it was added. If so, extend the seasons array (unwatched) and
+  // let the status fall back out of "watched" so it resurfaces in the main list.
+  useEffect(() => {
+    if (checkedForNewSeasons.current) return
+    checkedForNewSeasons.current = true
+    const tvItems = items.filter((i) => i.mediaType === 'tv' && Array.isArray(i.seasons))
+    tvItems.forEach((item) => {
+      getDetails('tv', item.tmdbId)
+        .then((details) => {
+          if (details.numberOfSeasons && details.numberOfSeasons > item.seasons.length) {
+            updateSeasonCount(item.id, details.numberOfSeasons)
+          }
+        })
+        .catch(() => {
+          // Silently ignore - not worth surfacing an error banner for a background check.
+        })
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
@@ -56,7 +78,10 @@ export default function WatchTab() {
       if (filters.mediaTypes.size > 0 && !filters.mediaTypes.has(item.mediaType)) {
         return false
       }
-      if (filters.statuses.size > 0 && !filters.statuses.has(item.status)) {
+      if (filters.statuses.size > 0) {
+        if (!filters.statuses.has(item.status)) return false
+      } else if (item.status === 'watched') {
+        // Finished titles stay out of the way by default; select "Watched" to see them.
         return false
       }
       if (filters.genres.size > 0) {
@@ -118,7 +143,12 @@ export default function WatchTab() {
           <p className="section-heading section-heading-highlight">
             Currently watching · {watchingItems.length}
           </p>
-          <TicketGrid items={watchingItems} onSetStatus={setStatus} onRemove={removeItem} />
+          <TicketGrid
+            items={watchingItems}
+            onSetStatus={setStatus}
+            onToggleSeason={toggleSeason}
+            onRemove={removeItem}
+          />
           <div className="section-divider" />
         </>
       )}
@@ -128,7 +158,12 @@ export default function WatchTab() {
       </p>
 
       {restItems.length > 0 ? (
-        <TicketGrid items={restItems} onSetStatus={setStatus} onRemove={removeItem} />
+        <TicketGrid
+          items={restItems}
+          onSetStatus={setStatus}
+          onToggleSeason={toggleSeason}
+          onRemove={removeItem}
+        />
       ) : (
         watchingItems.length === 0 && <EmptyState hasAnyItems={items.length > 0} />
       )}
