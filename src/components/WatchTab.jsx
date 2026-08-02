@@ -148,6 +148,7 @@ export default function WatchTab() {
             onSetStatus={setStatus}
             onToggleSeason={toggleSeason}
             onRemove={removeItem}
+            inWatchingSection
           />
           <div className="section-divider" />
         </>

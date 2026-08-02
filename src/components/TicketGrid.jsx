@@ -13,7 +13,7 @@ export function EmptyState({ hasAnyItems }) {
   )
 }
 
-export default function TicketGrid({ items, onSetStatus, onToggleSeason, onRemove }) {
+export default function TicketGrid({ items, onSetStatus, onToggleSeason, onRemove, inWatchingSection }) {
   return (
     <div className="media-grid-h">
       {items.map((item) => (
@@ -23,6 +23,7 @@ export default function TicketGrid({ items, onSetStatus, onToggleSeason, onRemov
           onSetStatus={onSetStatus}
           onToggleSeason={onToggleSeason}
           onRemove={onRemove}
+          inWatchingSection={inWatchingSection}
         />
       ))}
     </div>

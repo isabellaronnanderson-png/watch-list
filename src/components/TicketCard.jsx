@@ -3,10 +3,11 @@ import { formatRuntime, WATCH_STATUSES, ticketNumber } from '../utils/format'
 import { providerLabel } from '../utils/providers'
 import StatusStub from './StatusStub'
 import SeasonStatusControl from './SeasonStatusControl'
+import TvStatusControl from './TvStatusControl'
 
 const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
 
-export default function TicketCard({ item, onSetStatus, onToggleSeason, onRemove }) {
+export default function TicketCard({ item, onSetStatus, onToggleSeason, onRemove, inWatchingSection }) {
   const isTv = item.mediaType === 'tv' && Array.isArray(item.seasons) && item.seasons.length > 0
 
   return (
@@ -53,12 +54,21 @@ export default function TicketCard({ item, onSetStatus, onToggleSeason, onRemove
         <span className="media-card-runtime">{formatRuntime(item.runtimeMinutes)}</span>
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
-        {isTv ? (
+        {isTv && inWatchingSection && (
           <SeasonStatusControl
             seasons={item.seasons}
             onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
           />
-        ) : (
+        )}
+        {isTv && !inWatchingSection && (
+          <TvStatusControl
+            status={item.status}
+            seasons={item.seasons}
+            onSetStatus={(s) => onSetStatus(item.id, s)}
+            onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
+          />
+        )}
+        {!isTv && (
           <StatusStub
             statuses={WATCH_STATUSES}
             status={item.status}
