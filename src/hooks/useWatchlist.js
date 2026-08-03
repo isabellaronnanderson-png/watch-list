@@ -24,6 +24,7 @@ function migrateItem(item) {
     )
   }
   if (!migrated.providerIds) migrated.providerIds = []
+  if (!Array.isArray(migrated.tags)) migrated.tags = []
 
   // Re-seed per-season tracking for TV shows that predate it (or lost it in an
   // earlier migration). We don't know the true per-season history, so: shows
@@ -64,12 +65,25 @@ export function useWatchlist() {
         item.mediaType === 'tv' && item.numberOfSeasons > 0
           ? Array(item.numberOfSeasons).fill(false)
           : null
-      return [{ ...item, status: 'want', seasons, addedAt: Date.now() }, ...prev]
+      return [{ ...item, status: 'want', seasons, tags: [], addedAt: Date.now() }, ...prev]
     })
   }, [])
 
   const removeItem = useCallback((id) => {
     setItems((prev) => prev.filter((p) => p.id !== id))
+  }, [])
+
+  // Toggles a tag on/off for an item. Used for both the built-in "Favorite" tag
+  // and any free-text custom tags (e.g. "autumn").
+  const toggleTag = useCallback((id, tag) => {
+    setItems((prev) =>
+      prev.map((p) => {
+        if (p.id !== id) return p
+        const has = p.tags?.includes(tag)
+        const tags = has ? p.tags.filter((t) => t !== tag) : [...(p.tags || []), tag]
+        return { ...p, tags }
+      })
+    )
   }, [])
 
   // Movies use this directly (Want / Watching / Watched buttons).
@@ -101,5 +115,5 @@ export function useWatchlist() {
     )
   }, [])
 
-  return { items, addItem, removeItem, setStatus, toggleSeason, updateSeasonCount }
+  return { items, addItem, removeItem, setStatus, toggleSeason, updateSeasonCount, toggleTag }
 }

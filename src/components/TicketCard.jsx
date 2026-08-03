@@ -4,22 +4,34 @@ import { providerLabel } from '../utils/providers'
 import StatusStub from './StatusStub'
 import SeasonStatusControl from './SeasonStatusControl'
 import TvStatusControl from './TvStatusControl'
+import TagMenu from './TagMenu'
 
 const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
 
-export default function TicketCard({ item, onSetStatus, onToggleSeason, onRemove, inWatchingSection }) {
+export default function TicketCard({
+  item,
+  onSetStatus,
+  onToggleSeason,
+  onRemove,
+  onToggleTag,
+  allTags,
+  inWatchingSection,
+}) {
   const isTv = item.mediaType === 'tv' && Array.isArray(item.seasons) && item.seasons.length > 0
+  const tags = item.tags || []
 
   return (
     <article className={`media-card media-card-h${item.status === 'watched' ? ' is-done' : ''}`}>
       <button
-        className="media-card-remove"
+        className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}
         aria-label={`Remove ${item.title} from watchlist`}
         title="Remove"
       >
         ×
       </button>
+
+      <TagMenu tags={tags} allTags={allTags} onToggleTag={(tag) => onToggleTag(item.id, tag)} />
 
       <div className="media-card-cover">
         {item.posterPath ? (
@@ -40,6 +52,15 @@ export default function TicketCard({ item, onSetStatus, onToggleSeason, onRemove
         {item.genres?.length > 0 && (
           <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
         )}
+        {tags.length > 0 && (
+          <div className="media-card-tags">
+            {tags.map((t) => (
+              <span key={t} className="tag-chip">
+                {t === 'Favorite' ? '★ Favorite' : t}
+              </span>
+            ))}
+          </div>
+        )}
         <div className="media-card-providers">
           {item.providerIds?.length > 0 ? (
             item.providerIds.map((pid) => (
@@ -58,6 +79,7 @@ export default function TicketCard({ item, onSetStatus, onToggleSeason, onRemove
           <SeasonStatusControl
             seasons={item.seasons}
             onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
+            onSetStatus={(s) => onSetStatus(item.id, s)}
           />
         )}
         {isTv && !inWatchingSection && (

@@ -3,12 +3,14 @@ import { ALL_PROVIDER_FILTER_OPTIONS } from '../utils/providers'
 
 export default function FilterBar({
   allGenres,
+  allTags,
   filters,
   onToggleGenre,
   onToggleRuntime,
   onToggleProvider,
   onToggleMediaType,
   onToggleStatus,
+  onToggleTag,
   onSortChange,
   onClear,
   hasActiveFilters,
@@ -61,6 +63,22 @@ export default function FilterBar({
               onClick={() => onToggleGenre(g)}
             >
               {g}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="filter-group">
+        <span className="filter-group-label">Tags</span>
+        <div className="chip-row">
+          {allTags.map((t) => (
+            <button
+              key={t}
+              className="chip"
+              aria-pressed={filters.tags.has(t)}
+              onClick={() => onToggleTag(t)}
+            >
+              {t === 'Favorite' ? '★ Favorite' : t}
             </button>
           ))}
         </div>

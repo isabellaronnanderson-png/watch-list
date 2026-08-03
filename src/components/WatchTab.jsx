@@ -12,11 +12,13 @@ const EMPTY_FILTERS = {
   providers: new Set(),
   mediaTypes: new Set(),
   statuses: new Set(),
+  tags: new Set(),
   sort: 'title',
 }
 
 export default function WatchTab() {
-  const { items, addItem, removeItem, setStatus, toggleSeason, updateSeasonCount } = useWatchlist()
+  const { items, addItem, removeItem, setStatus, toggleSeason, updateSeasonCount, toggleTag } =
+    useWatchlist()
   const [genreMaps, setGenreMaps] = useState(null)
   const [configError, setConfigError] = useState(null)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
@@ -57,6 +59,17 @@ export default function WatchTab() {
     return Array.from(s).sort()
   }, [items])
 
+  const allTags = useMemo(() => {
+    const s = new Set()
+    items.forEach((i) => i.tags?.forEach((t) => s.add(t)))
+    return Array.from(s).sort()
+  }, [items])
+
+  const tagFilterOptions = useMemo(() => {
+    const others = allTags.filter((t) => t !== 'Favorite')
+    return ['Favorite', ...others]
+  }, [allTags])
+
   function toggleSetValue(setName, value) {
     setFilters((prev) => {
       const next = new Set(prev[setName])
@@ -71,7 +84,8 @@ export default function WatchTab() {
     filters.runtimes.size > 0 ||
     filters.providers.size > 0 ||
     filters.mediaTypes.size > 0 ||
-    filters.statuses.size > 0
+    filters.statuses.size > 0 ||
+    filters.tags.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
@@ -87,6 +101,10 @@ export default function WatchTab() {
       if (filters.genres.size > 0) {
         const hasGenre = item.genres?.some((g) => filters.genres.has(g))
         if (!hasGenre) return false
+      }
+      if (filters.tags.size > 0) {
+        const hasTag = item.tags?.some((t) => filters.tags.has(t))
+        if (!hasTag) return false
       }
       if (filters.runtimes.size > 0) {
         const bucketMatch = RUNTIME_BUCKETS.some(
@@ -127,12 +145,14 @@ export default function WatchTab() {
 
       <FilterBar
         allGenres={allGenres}
+        allTags={tagFilterOptions}
         filters={filters}
         onToggleGenre={(g) => toggleSetValue('genres', g)}
         onToggleRuntime={(r) => toggleSetValue('runtimes', r)}
         onToggleProvider={(p) => toggleSetValue('providers', p)}
         onToggleMediaType={(t) => toggleSetValue('mediaTypes', t)}
         onToggleStatus={(s) => toggleSetValue('statuses', s)}
+        onToggleTag={(t) => toggleSetValue('tags', t)}
         onSortChange={(sort) => setFilters((prev) => ({ ...prev, sort }))}
         onClear={() => setFilters(EMPTY_FILTERS)}
         hasActiveFilters={hasActiveFilters}
@@ -148,6 +168,8 @@ export default function WatchTab() {
             onSetStatus={setStatus}
             onToggleSeason={toggleSeason}
             onRemove={removeItem}
+            onToggleTag={toggleTag}
+            allTags={allTags}
             inWatchingSection
           />
           <div className="section-divider" />
@@ -164,6 +186,8 @@ export default function WatchTab() {
           onSetStatus={setStatus}
           onToggleSeason={toggleSeason}
           onRemove={removeItem}
+          onToggleTag={toggleTag}
+          allTags={allTags}
         />
       ) : (
         watchingItems.length === 0 && <EmptyState hasAnyItems={items.length > 0} />

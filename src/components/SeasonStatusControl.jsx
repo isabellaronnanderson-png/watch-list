@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function SeasonStatusControl({ seasons, onToggleSeason }) {
+export default function SeasonStatusControl({ seasons, onToggleSeason, onSetStatus }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
@@ -42,6 +42,9 @@ export default function SeasonStatusControl({ seasons, onToggleSeason }) {
           ))}
         </div>
       )}
+      <button type="button" className="season-back-link" onClick={() => onSetStatus('want')}>
+        ← Back to library
+      </button>
     </div>
   )
 }

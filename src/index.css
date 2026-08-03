@@ -537,6 +537,124 @@ input:focus-visible,
   opacity: 1;
 }
 
+.media-card-remove-left {
+  left: 8px;
+  right: auto;
+}
+
+/* ---------- Tag menu ---------- */
+
+.tag-menu {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+}
+
+.media-card-tag-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.media-card:hover .media-card-tag-btn,
+.media-card-tag-btn.is-active,
+.media-card-tag-btn:focus-visible {
+  opacity: 1;
+}
+
+.tag-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 6;
+  width: 180px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  padding: 8px;
+}
+
+.tag-dropdown-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.tag-dropdown-row:hover {
+  background: var(--surface-alt);
+}
+
+.tag-dropdown-row input {
+  cursor: pointer;
+}
+
+.tag-add-form {
+  display: flex;
+  gap: 4px;
+  margin-top: 6px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.tag-add-form input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 5px 6px;
+}
+
+.tag-add-form button {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 0 8px;
+  cursor: pointer;
+}
+
+.media-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.tag-chip {
+  font-family: var(--font-sans);
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  background: var(--surface-alt);
+  border-radius: 999px;
+  padding: 2px 7px;
+}
+
 .media-card-perforation {
   height: 0;
   border-top: 2px dashed var(--border);
@@ -688,6 +806,10 @@ input:focus-visible,
 
 /* ---------- Season control (TV shows) ---------- */
 
+.tv-status-control {
+  position: relative;
+}
+
 .season-control {
   position: relative;
   margin-top: 8px;
@@ -747,6 +869,26 @@ input:focus-visible,
 
 .season-dropdown-row input {
   cursor: pointer;
+}
+
+.season-back-link {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 2px 0;
+}
+
+.season-back-link:hover {
+  color: var(--text);
 }
 
 /* ---------- Manual add form (Listen tab) ---------- */
