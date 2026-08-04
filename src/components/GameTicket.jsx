@@ -1,20 +1,25 @@
 import { GAME_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
+import TagMenu from './TagMenu'
 
 const LABELS = { want: 'Want', playing: 'Playing', played: 'Played' }
 const MODE_LABELS = { singleplayer: 'Singleplayer', multiplayer: 'Multiplayer' }
 
-export default function GameTicket({ item, onSetStatus, onRemove }) {
+export default function GameTicket({ item, onSetStatus, onRemove, onToggleTag, allTags }) {
+  const tags = item.tags || []
+
   return (
     <article className={`media-card${item.status === 'played' ? ' is-done' : ''}`}>
       <button
-        className="media-card-remove"
+        className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}
         aria-label={`Remove ${item.title} from games list`}
         title="Remove"
       >
         ×
       </button>
+
+      <TagMenu tags={tags} allTags={allTags} onToggleTag={(tag) => onToggleTag(item.id, tag)} />
 
       <div className="media-card-cover media-card-cover-wide">
         {item.coverUrl ? (
@@ -37,6 +42,15 @@ export default function GameTicket({ item, onSetStatus, onRemove }) {
         )}
         {item.genres?.length > 0 && (
           <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
+        )}
+        {tags.length > 0 && (
+          <div className="media-card-tags">
+            {tags.map((t) => (
+              <span key={t} className="tag-chip">
+                {t === 'Favorite' ? '★ Favorite' : t}
+              </span>
+            ))}
+          </div>
         )}
         <div className="media-card-providers">
           {item.modes?.length > 0 ? (

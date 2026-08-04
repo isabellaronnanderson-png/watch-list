@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import GamesHeader from './GamesHeader'
 import GameTicket from './GameTicket'
+import TagFilterGroup from './TagFilterGroup'
 import { useGameslist } from '../hooks/useGameslist'
 import { GAME_STATUSES, LENGTH_BUCKETS, GAME_MODES } from '../utils/format'
 
@@ -10,11 +11,12 @@ const EMPTY_FILTERS = {
   platforms: new Set(),
   lengths: new Set(),
   modes: new Set(),
+  tags: new Set(),
   sort: 'title',
 }
 
 export default function GamesTab() {
-  const { items, addItem, removeItem, setStatus } = useGameslist()
+  const { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag } = useGameslist()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
@@ -31,6 +33,13 @@ export default function GamesTab() {
     return Array.from(s).sort()
   }, [items])
 
+  const allTags = useMemo(() => {
+    const s = new Set()
+    items.forEach((i) => i.tags?.forEach((t) => s.add(t)))
+    const others = Array.from(s).filter((t) => t !== 'Favorite').sort()
+    return ['Favorite', ...others]
+  }, [items])
+
   function toggleSetValue(setName, value) {
     setFilters((prev) => {
       const next = new Set(prev[setName])
@@ -45,19 +54,21 @@ export default function GamesTab() {
     filters.genres.size > 0 ||
     filters.platforms.size > 0 ||
     filters.lengths.size > 0 ||
-    filters.modes.size > 0
+    filters.modes.size > 0 ||
+    filters.tags.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
       if (filters.statuses.size > 0) {
         if (!filters.statuses.has(item.status)) return false
-      } else if (item.status === 'played') {
+      } else if (item.status === 'played' && filters.tags.size === 0) {
         return false
       }
       if (filters.genres.size > 0 && !item.genres?.some((g) => filters.genres.has(g))) return false
       if (filters.platforms.size > 0 && !item.platforms?.some((p) => filters.platforms.has(p)))
         return false
       if (filters.modes.size > 0 && !item.modes?.some((m) => filters.modes.has(m))) return false
+      if (filters.tags.size > 0 && !item.tags?.some((t) => filters.tags.has(t))) return false
       if (filters.lengths.size > 0) {
         const bucketMatch = LENGTH_BUCKETS.some(
           (b) => filters.lengths.has(b.id) && b.test(item.playtimeHours)
@@ -135,6 +146,14 @@ export default function GamesTab() {
           </div>
         </div>
 
+        <TagFilterGroup
+          allTags={allTags}
+          selectedTags={filters.tags}
+          onToggleTag={(t) => toggleSetValue('tags', t)}
+          onRenameTag={renameTag}
+          onDeleteTag={deleteTag}
+        />
+
         <div className="filter-group">
           <span className="filter-group-label">Length</span>
           <div className="chip-row">
@@ -193,7 +212,14 @@ export default function GamesTab() {
           </p>
           <div className="media-grid">
             {playingItems.map((item) => (
-              <GameTicket key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
+              <GameTicket
+                key={item.id}
+                item={item}
+                onSetStatus={setStatus}
+                onRemove={removeItem}
+                onToggleTag={toggleTag}
+                allTags={allTags}
+              />
             ))}
           </div>
           <div className="section-divider" />
@@ -207,7 +233,14 @@ export default function GamesTab() {
       {restItems.length > 0 ? (
         <div className="media-grid">
           {restItems.map((item) => (
-            <GameTicket key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
+            <GameTicket
+              key={item.id}
+              item={item}
+              onSetStatus={setStatus}
+              onRemove={removeItem}
+              onToggleTag={toggleTag}
+              allTags={allTags}
+            />
           ))}
         </div>
       ) : (

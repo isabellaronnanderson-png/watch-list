@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { makeTagActions } from './tagHelpers'
 
 const STORAGE_KEY = 'marquee-watchlist:listen'
 
@@ -7,6 +8,7 @@ function migrateItem(item) {
   if (!migrated.status) {
     migrated.status = migrated.listened ? 'listened' : 'want'
   }
+  if (!Array.isArray(migrated.tags)) migrated.tags = []
   delete migrated.listened
   return migrated
 }
@@ -31,7 +33,7 @@ export function useListenlist() {
   const addItem = useCallback((item) => {
     setItems((prev) => {
       if (item.id && prev.some((p) => p.id === item.id)) return prev
-      return [{ ...item, status: 'want', addedAt: Date.now() }, ...prev]
+      return [{ ...item, status: 'want', tags: [], addedAt: Date.now() }, ...prev]
     })
   }, [])
 
@@ -43,5 +45,7 @@ export function useListenlist() {
     setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
   }, [])
 
-  return { items, addItem, removeItem, setStatus }
+  const { toggleTag, renameTag, deleteTag } = useMemo(() => makeTagActions(setItems), [])
+
+  return { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag }
 }

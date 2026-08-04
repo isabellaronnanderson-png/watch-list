@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { makeTagActions } from './tagHelpers'
 
 const STORAGE_KEY = 'marquee-watchlist:youtube'
 
@@ -7,6 +8,7 @@ function migrateItem(item) {
   if (!migrated.status) {
     migrated.status = migrated.watched ? 'watched' : 'want'
   }
+  if (!Array.isArray(migrated.tags)) migrated.tags = []
   delete migrated.watched
   return migrated
 }
@@ -31,7 +33,7 @@ export function useWatchLater() {
   const addItem = useCallback((item) => {
     setItems((prev) => {
       if (prev.some((p) => p.id === item.id)) return prev
-      return [{ ...item, status: 'want', addedAt: Date.now() }, ...prev]
+      return [{ ...item, status: 'want', tags: [], addedAt: Date.now() }, ...prev]
     })
   }, [])
 
@@ -43,5 +45,7 @@ export function useWatchLater() {
     setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
   }, [])
 
-  return { items, addItem, removeItem, setStatus }
+  const { toggleTag, renameTag, deleteTag } = useMemo(() => makeTagActions(setItems), [])
+
+  return { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag }
 }

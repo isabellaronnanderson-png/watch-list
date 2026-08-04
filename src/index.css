@@ -365,6 +365,114 @@ input:focus-visible,
   font-style: italic;
 }
 
+.filter-group-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.filter-manage-link {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+}
+
+.filter-manage-link:hover {
+  color: var(--text);
+}
+
+/* ---------- Tag manager modal ---------- */
+
+.tag-manager-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag-manager {
+  width: 280px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  padding: 16px;
+}
+
+.tag-manager-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.tag-manager-header button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.tag-manager-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tag-manager-row input[type='text'] {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 7px 9px;
+  color: var(--text);
+}
+
+.tag-manager-row input[type='text']:disabled {
+  color: var(--text-faint);
+  background: var(--surface-alt);
+}
+
+.tag-manager-delete {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text-muted);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.tag-manager-delete:hover {
+  background: var(--surface-alt);
+  color: var(--text);
+}
+
 /* ---------- Section headings ---------- */
 
 .section-heading {

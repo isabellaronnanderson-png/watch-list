@@ -1,5 +1,6 @@
 import { RUNTIME_BUCKETS, MEDIA_TYPES, WATCH_STATUSES } from '../utils/format'
 import { ALL_PROVIDER_FILTER_OPTIONS } from '../utils/providers'
+import TagFilterGroup from './TagFilterGroup'
 
 export default function FilterBar({
   allGenres,
@@ -11,6 +12,8 @@ export default function FilterBar({
   onToggleMediaType,
   onToggleStatus,
   onToggleTag,
+  onRenameTag,
+  onDeleteTag,
   onSortChange,
   onClear,
   hasActiveFilters,
@@ -68,21 +71,13 @@ export default function FilterBar({
         </div>
       </div>
 
-      <div className="filter-group">
-        <span className="filter-group-label">Tags</span>
-        <div className="chip-row">
-          {allTags.map((t) => (
-            <button
-              key={t}
-              className="chip"
-              aria-pressed={filters.tags.has(t)}
-              onClick={() => onToggleTag(t)}
-            >
-              {t === 'Favorite' ? '★ Favorite' : t}
-            </button>
-          ))}
-        </div>
-      </div>
+      <TagFilterGroup
+        allTags={allTags}
+        selectedTags={filters.tags}
+        onToggleTag={onToggleTag}
+        onRenameTag={onRenameTag}
+        onDeleteTag={onDeleteTag}
+      />
 
       <div className="filter-group">
         <span className="filter-group-label">Runtime</span>

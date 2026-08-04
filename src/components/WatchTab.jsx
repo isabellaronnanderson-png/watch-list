@@ -17,8 +17,17 @@ const EMPTY_FILTERS = {
 }
 
 export default function WatchTab() {
-  const { items, addItem, removeItem, setStatus, toggleSeason, updateSeasonCount, toggleTag } =
-    useWatchlist()
+  const {
+    items,
+    addItem,
+    removeItem,
+    setStatus,
+    toggleSeason,
+    updateSeasonCount,
+    toggleTag,
+    renameTag,
+    deleteTag,
+  } = useWatchlist()
   const [genreMaps, setGenreMaps] = useState(null)
   const [configError, setConfigError] = useState(null)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
@@ -94,8 +103,10 @@ export default function WatchTab() {
       }
       if (filters.statuses.size > 0) {
         if (!filters.statuses.has(item.status)) return false
-      } else if (item.status === 'watched') {
-        // Finished titles stay out of the way by default; select "Watched" to see them.
+      } else if (item.status === 'watched' && filters.tags.size === 0) {
+        // Finished titles stay out of the way by default; select "Watched" to see
+        // them, or filter by a tag - tagged items (rewatch favorites etc.) stay
+        // visible regardless of watched status.
         return false
       }
       if (filters.genres.size > 0) {
@@ -153,6 +164,8 @@ export default function WatchTab() {
         onToggleMediaType={(t) => toggleSetValue('mediaTypes', t)}
         onToggleStatus={(s) => toggleSetValue('statuses', s)}
         onToggleTag={(t) => toggleSetValue('tags', t)}
+        onRenameTag={renameTag}
+        onDeleteTag={deleteTag}
         onSortChange={(sort) => setFilters((prev) => ({ ...prev, sort }))}
         onClear={() => setFilters(EMPTY_FILTERS)}
         hasActiveFilters={hasActiveFilters}

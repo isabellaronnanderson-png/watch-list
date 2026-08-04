@@ -6,7 +6,19 @@ export default function ReadHeader({ onAdd, existingIds }) {
   const [results, setResults] = useState([])
   const [status, setStatus] = useState('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [showResults, setShowResults] = useState(false)
   const debounceRef = useRef(null)
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setShowResults(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     if (!query.trim()) {
@@ -46,17 +58,21 @@ export default function ReadHeader({ onAdd, existingIds }) {
   return (
     <>
 
-      <div className="search-bar">
+      <div className="search-bar" ref={containerRef}>
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value)
+            setShowResults(true)
+          }}
+          onFocus={() => query.trim() && setShowResults(true)}
           placeholder="Search for a book or author…"
           aria-label="Search for a book to add"
         />
         <span className="search-bar-label">Search</span>
 
-        {(status === 'loading' || status === 'error' || results.length > 0) && (
+        {showResults && (status === 'loading' || status === 'error' || results.length > 0) && (
           <div className="results-panel" role="listbox">
             {status === 'loading' && <p className="results-status">Searching…</p>}
             {status === 'error' && <p className="results-error">{errorMsg}</p>}

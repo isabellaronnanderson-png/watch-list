@@ -8,7 +8,19 @@ export default function GamesHeader({ onAdd, existingIds }) {
   const [status, setStatus] = useState('idle')
   const [errorMsg, setErrorMsg] = useState('')
   const [addingId, setAddingId] = useState(null)
+  const [showResults, setShowResults] = useState(false)
   const debounceRef = useRef(null)
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setShowResults(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     if (!query.trim()) {
@@ -58,17 +70,21 @@ export default function GamesHeader({ onAdd, existingIds }) {
   return (
     <>
 
-      <div className="search-bar">
+      <div className="search-bar" ref={containerRef}>
         <input
           type="text"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(e) => {
+            setQuery(e.target.value)
+            setShowResults(true)
+          }}
+          onFocus={() => query.trim() && setShowResults(true)}
           placeholder="Search for a video game…"
           aria-label="Search for a video game to add"
         />
         <span className="search-bar-label">Search</span>
 
-        {(status === 'loading' || status === 'error' || results.length > 0) && (
+        {showResults && (status === 'loading' || status === 'error' || results.length > 0) && (
           <div className="results-panel" role="listbox">
             {status === 'loading' && <p className="results-status">Searching…</p>}
             {status === 'error' && <p className="results-error">{errorMsg}</p>}

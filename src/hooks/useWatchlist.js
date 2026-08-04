@@ -86,6 +86,28 @@ export function useWatchlist() {
     )
   }, [])
 
+  // Renames a tag everywhere it's used (merging into an existing tag of the new
+  // name if one already exists, rather than creating a duplicate).
+  const renameTag = useCallback((oldName, newName) => {
+    setItems((prev) =>
+      prev.map((p) => {
+        if (!p.tags?.includes(oldName)) return p
+        const tags = Array.from(new Set(p.tags.map((t) => (t === oldName ? newName : t))))
+        return { ...p, tags }
+      })
+    )
+  }, [])
+
+  // Removes a tag from every item that has it.
+  const deleteTag = useCallback((name) => {
+    setItems((prev) =>
+      prev.map((p) => {
+        if (!p.tags?.includes(name)) return p
+        return { ...p, tags: p.tags.filter((t) => t !== name) }
+      })
+    )
+  }, [])
+
   // Movies use this directly (Want / Watching / Watched buttons).
   const setStatus = useCallback((id, status) => {
     setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
@@ -115,5 +137,15 @@ export function useWatchlist() {
     )
   }, [])
 
-  return { items, addItem, removeItem, setStatus, toggleSeason, updateSeasonCount, toggleTag }
+  return {
+    items,
+    addItem,
+    removeItem,
+    setStatus,
+    toggleSeason,
+    updateSeasonCount,
+    toggleTag,
+    renameTag,
+    deleteTag,
+  }
 }

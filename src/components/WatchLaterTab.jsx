@@ -1,16 +1,24 @@
 import { useMemo, useState } from 'react'
 import WatchLaterHeader from './WatchLaterHeader'
 import WatchLaterTile from './WatchLaterTile'
+import TagFilterGroup from './TagFilterGroup'
 import { useWatchLater } from '../hooks/useWatchLater'
 import { WATCH_STATUSES } from '../utils/format'
 
-const EMPTY_FILTERS = { statuses: new Set(), sort: 'title' }
+const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), sort: 'title' }
 
 export default function WatchLaterTab() {
-  const { items, addItem, removeItem, setStatus } = useWatchLater()
+  const { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag } = useWatchLater()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
+
+  const allTags = useMemo(() => {
+    const s = new Set()
+    items.forEach((i) => i.tags?.forEach((t) => s.add(t)))
+    const others = Array.from(s).filter((t) => t !== 'Favorite').sort()
+    return ['Favorite', ...others]
+  }, [items])
 
   function toggleStatus(s) {
     setFilters((prev) => {
@@ -21,10 +29,26 @@ export default function WatchLaterTab() {
     })
   }
 
+  function toggleTagFilter(t) {
+    setFilters((prev) => {
+      const next = new Set(prev.tags)
+      if (next.has(t)) next.delete(t)
+      else next.add(t)
+      return { ...prev, tags: next }
+    })
+  }
+
+  const hasActiveFilters = filters.statuses.size > 0 || filters.tags.size > 0
+
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
-      if (filters.statuses.size > 0) return filters.statuses.has(item.status)
-      return item.status !== 'watched'
+      if (filters.statuses.size > 0) {
+        if (!filters.statuses.has(item.status)) return false
+      } else if (item.status === 'watched' && filters.tags.size === 0) {
+        return false
+      }
+      if (filters.tags.size > 0 && !item.tags?.some((t) => filters.tags.has(t))) return false
+      return true
     })
     list = [...list].sort((a, b) => {
       if (filters.sort === 'title') return a.title.localeCompare(b.title)
@@ -57,6 +81,14 @@ export default function WatchLaterTab() {
           </div>
         </div>
 
+        <TagFilterGroup
+          allTags={allTags}
+          selectedTags={filters.tags}
+          onToggleTag={toggleTagFilter}
+          onRenameTag={renameTag}
+          onDeleteTag={deleteTag}
+        />
+
         <div className="filter-group">
           <span className="filter-group-label">Sort</span>
           <select
@@ -69,7 +101,7 @@ export default function WatchLaterTab() {
           </select>
         </div>
 
-        {filters.statuses.size > 0 && (
+        {hasActiveFilters && (
           <button className="filter-clear" onClick={() => setFilters(EMPTY_FILTERS)}>
             Clear filters
           </button>
@@ -83,7 +115,14 @@ export default function WatchLaterTab() {
           </p>
           <div className="media-grid media-grid-wide">
             {watchingItems.map((item) => (
-              <WatchLaterTile key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
+              <WatchLaterTile
+                key={item.id}
+                item={item}
+                onSetStatus={setStatus}
+                onRemove={removeItem}
+                onToggleTag={toggleTag}
+                allTags={allTags}
+              />
             ))}
           </div>
           <div className="section-divider" />
@@ -97,7 +136,14 @@ export default function WatchLaterTab() {
       {restItems.length > 0 ? (
         <div className="media-grid media-grid-wide">
           {restItems.map((item) => (
-            <WatchLaterTile key={item.id} item={item} onSetStatus={setStatus} onRemove={removeItem} />
+            <WatchLaterTile
+              key={item.id}
+              item={item}
+              onSetStatus={setStatus}
+              onRemove={removeItem}
+              onToggleTag={toggleTag}
+              allTags={allTags}
+            />
           ))}
         </div>
       ) : (
