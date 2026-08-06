@@ -5,7 +5,7 @@ import TagMenu from './TagMenu'
 
 const LABELS = { want: 'Want', listening: 'Listening', listened: 'Listened' }
 
-export default function ListenTile({ item, onSetStatus, onRemove, onToggleTag, allTags }) {
+export default function ListenTile({ item, onSetStatus, onRemove, onToggleTag, allTags, dimDone = true }) {
   const isAudiobook = item.kind === 'audiobook'
   const cover = isAudiobook
     ? item.coverUrl || (item.coverId ? openLibraryCoverUrl(item.coverId, 'M') : null)
@@ -13,7 +13,7 @@ export default function ListenTile({ item, onSetStatus, onRemove, onToggleTag, a
   const tags = item.tags || []
 
   return (
-    <article className={`media-card media-card-h${item.status === 'listened' ? ' is-done' : ''}`}>
+    <article className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}

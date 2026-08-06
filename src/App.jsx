@@ -6,6 +6,7 @@ import ReadTab from './components/ReadTab'
 import ListenTab from './components/ListenTab'
 import GamesTab from './components/GamesTab'
 import WatchLaterTab from './components/WatchLaterTab'
+import ArticlesTab from './components/ArticlesTab'
 
 export default function App() {
   const [tab, setTab] = useState('watch')
@@ -19,6 +20,7 @@ export default function App() {
       {tab === 'listen' && <ListenTab />}
       {tab === 'games' && <GamesTab />}
       {tab === 'watchlater' && <WatchLaterTab />}
+      {tab === 'articles' && <ArticlesTab />}
     </div>
   )
 }

@@ -5,12 +5,12 @@ import TagMenu from './TagMenu'
 
 const LABELS = { want: 'Want', reading: 'Reading', read: 'Read' }
 
-export default function BookTicket({ item, onSetStatus, onRemove, onToggleTag, allTags }) {
+export default function BookTicket({ item, onSetStatus, onRemove, onToggleTag, allTags, dimDone = true }) {
   const cover = item.coverUrl || (item.coverId ? openLibraryCoverUrl(item.coverId, 'M') : null)
   const tags = item.tags || []
 
   return (
-    <article className={`media-card media-card-h${item.status === 'read' ? ' is-done' : ''}`}>
+    <article className={`media-card media-card-h${item.status === 'read' && dimDone ? ' is-done' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}

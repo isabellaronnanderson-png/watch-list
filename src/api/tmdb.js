@@ -33,6 +33,32 @@ export async function searchTitles(query) {
   return (data.results || []).filter((r) => r.media_type === 'movie' || r.media_type === 'tv')
 }
 
+/**
+ * Search by director name: finds the best-matching person, then pulls anything
+ * they directed from their combined credits. Results are shaped like the regular
+ * multi-search results so they can be merged into the same list.
+ */
+export async function searchByDirector(query) {
+  if (!query || !query.trim()) return []
+  const people = await get('/search/person', { query })
+  const person = people.results?.[0]
+  if (!person) return []
+  const credits = await get(`/person/${person.id}/combined_credits`)
+  const directed = (credits.crew || []).filter((c) => c.job === 'Director')
+  return directed
+    .filter((c) => c.media_type === 'movie' || c.media_type === 'tv')
+    .map((c) => ({
+      id: c.id,
+      media_type: c.media_type,
+      title: c.title,
+      name: c.name,
+      poster_path: c.poster_path,
+      release_date: c.release_date,
+      first_air_date: c.first_air_date,
+      genre_ids: c.genre_ids,
+    }))
+}
+
 /** Fetch and merge movie + tv genre lists, keyed by media type. */
 export async function getGenreMaps() {
   const [movieGenres, tvGenres] = await Promise.all([

@@ -16,12 +16,13 @@ export default function TicketCard({
   onToggleTag,
   allTags,
   inWatchingSection,
+  dimDone = true,
 }) {
   const isTv = item.mediaType === 'tv' && Array.isArray(item.seasons) && item.seasons.length > 0
   const tags = item.tags || []
 
   return (
-    <article className={`media-card media-card-h${item.status === 'watched' ? ' is-done' : ''}`}>
+    <article className={`media-card media-card-h${item.status === 'watched' && dimDone ? ' is-done' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}

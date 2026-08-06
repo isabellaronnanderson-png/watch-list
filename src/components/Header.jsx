@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { searchTitles, getDetails, getWatchProviders, posterUrl } from '../api/tmdb'
+import { searchTitles, searchByDirector, getDetails, getWatchProviders, posterUrl } from '../api/tmdb'
 import { yearFromDate } from '../utils/format'
 import { canonicalizeProvider } from '../utils/providers'
 
@@ -33,8 +33,17 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
     clearTimeout(debounceRef.current)
     debounceRef.current = setTimeout(async () => {
       try {
-        const data = await searchTitles(query)
-        setResults(data.slice(0, 8))
+        const [titleResults, directorResults] = await Promise.all([
+          searchTitles(query),
+          searchByDirector(query).catch(() => []),
+        ])
+        const merged = [...titleResults]
+        directorResults.forEach((r) => {
+          if (!merged.some((m) => m.id === r.id && m.media_type === r.media_type)) {
+            merged.push(r)
+          }
+        })
+        setResults(merged.slice(0, 20))
         setStatus('idle')
       } catch (err) {
         setErrorMsg(err.message)

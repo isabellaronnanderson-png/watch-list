@@ -368,8 +368,7 @@ input:focus-visible,
 .filter-group-label-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
 }
 
 .filter-manage-link {
@@ -687,6 +686,8 @@ input:focus-visible,
   right: 0;
   z-index: 6;
   width: 180px;
+  max-height: 220px;
+  overflow-y: auto;
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 6px;

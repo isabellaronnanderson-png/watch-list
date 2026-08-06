@@ -219,6 +219,7 @@ export default function GamesTab() {
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
                 allTags={allTags}
+                dimDone={filters.tags.size === 0}
               />
             ))}
           </div>
@@ -240,6 +241,7 @@ export default function GamesTab() {
               onRemove={removeItem}
               onToggleTag={toggleTag}
               allTags={allTags}
+                dimDone={filters.tags.size === 0}
             />
           ))}
         </div>

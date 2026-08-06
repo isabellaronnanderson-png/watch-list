@@ -122,6 +122,7 @@ export default function WatchLaterTab() {
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
                 allTags={allTags}
+                dimDone={filters.tags.size === 0}
               />
             ))}
           </div>
@@ -143,6 +144,7 @@ export default function WatchLaterTab() {
               onRemove={removeItem}
               onToggleTag={toggleTag}
               allTags={allTags}
+                dimDone={filters.tags.size === 0}
             />
           ))}
         </div>

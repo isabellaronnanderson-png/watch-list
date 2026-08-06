@@ -184,6 +184,7 @@ export default function WatchTab() {
             onToggleTag={toggleTag}
             allTags={allTags}
             inWatchingSection
+            dimDone={filters.tags.size === 0}
           />
           <div className="section-divider" />
         </>
@@ -201,6 +202,7 @@ export default function WatchTab() {
           onRemove={removeItem}
           onToggleTag={toggleTag}
           allTags={allTags}
+          dimDone={filters.tags.size === 0}
         />
       ) : (
         watchingItems.length === 0 && <EmptyState hasAnyItems={items.length > 0} />

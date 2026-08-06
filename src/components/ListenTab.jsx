@@ -146,6 +146,7 @@ export default function ListenTab() {
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
                 allTags={allTags}
+                dimDone={filters.tags.size === 0}
               />
             ))}
           </div>
@@ -167,6 +168,7 @@ export default function ListenTab() {
               onRemove={removeItem}
               onToggleTag={toggleTag}
               allTags={allTags}
+                dimDone={filters.tags.size === 0}
             />
           ))}
         </div>

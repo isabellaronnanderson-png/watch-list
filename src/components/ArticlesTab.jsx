@@ -1,23 +1,17 @@
 import { useMemo, useState } from 'react'
-import ReadHeader from './ReadHeader'
-import BookTicket from './BookTicket'
+import ArticlesHeader from './ArticlesHeader'
+import ArticleTile from './ArticleTile'
 import TagFilterGroup from './TagFilterGroup'
-import { useReadlist } from '../hooks/useReadlist'
+import { useArticles } from '../hooks/useArticles'
 import { READ_STATUSES } from '../utils/format'
 
-const EMPTY_FILTERS = { genres: new Set(), statuses: new Set(), tags: new Set(), sort: 'title' }
+const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), sort: 'title' }
 
-export default function ReadTab() {
-  const { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag } = useReadlist()
+export default function ArticlesTab() {
+  const { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag } = useArticles()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
-
-  const allGenres = useMemo(() => {
-    const s = new Set()
-    items.forEach((i) => i.genres?.forEach((g) => s.add(g)))
-    return Array.from(s).sort()
-  }, [items])
 
   const allTags = useMemo(() => {
     const s = new Set()
@@ -35,8 +29,7 @@ export default function ReadTab() {
     })
   }
 
-  const hasActiveFilters =
-    filters.genres.size > 0 || filters.statuses.size > 0 || filters.tags.size > 0
+  const hasActiveFilters = filters.statuses.size > 0 || filters.tags.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
@@ -45,14 +38,7 @@ export default function ReadTab() {
       } else if (item.status === 'read' && filters.tags.size === 0) {
         return false
       }
-      if (filters.genres.size > 0) {
-        const hasGenre = item.genres?.some((g) => filters.genres.has(g))
-        if (!hasGenre) return false
-      }
-      if (filters.tags.size > 0) {
-        const hasTag = item.tags?.some((t) => filters.tags.has(t))
-        if (!hasTag) return false
-      }
+      if (filters.tags.size > 0 && !item.tags?.some((t) => filters.tags.has(t))) return false
       return true
     })
     list = [...list].sort((a, b) => {
@@ -67,7 +53,7 @@ export default function ReadTab() {
 
   return (
     <>
-      <ReadHeader onAdd={addItem} existingIds={existingIds} />
+      <ArticlesHeader onAdd={addItem} existingIds={existingIds} />
 
       <div className="filter-window">
         <div className="filter-group">
@@ -81,25 +67,6 @@ export default function ReadTab() {
                 onClick={() => toggleSetValue('statuses', s.id)}
               >
                 {s.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="filter-group">
-          <span className="filter-group-label">Genre</span>
-          <div className="chip-row">
-            {allGenres.length === 0 && (
-              <span className="filter-hint">Add books to populate genres</span>
-            )}
-            {allGenres.map((g) => (
-              <button
-                key={g}
-                className="chip"
-                aria-pressed={filters.genres.has(g)}
-                onClick={() => toggleSetValue('genres', g)}
-              >
-                {g}
               </button>
             ))}
           </div>
@@ -137,9 +104,9 @@ export default function ReadTab() {
           <p className="section-heading section-heading-highlight">
             Currently reading · {readingItems.length}
           </p>
-          <div className="media-grid-h">
+          <div className="media-grid media-grid-wide">
             {readingItems.map((item) => (
-              <BookTicket
+              <ArticleTile
                 key={item.id}
                 item={item}
                 onSetStatus={setStatus}
@@ -155,32 +122,28 @@ export default function ReadTab() {
       )}
 
       <p className="section-heading">
-        {restItems.length} book{restItems.length === 1 ? '' : 's'} on the shelf
+        {restItems.length} article{restItems.length === 1 ? '' : 's'} saved
       </p>
 
       {restItems.length > 0 ? (
-        <div className="media-grid-h">
+        <div className="media-grid media-grid-wide">
           {restItems.map((item) => (
-            <BookTicket
+            <ArticleTile
               key={item.id}
               item={item}
               onSetStatus={setStatus}
               onRemove={removeItem}
               onToggleTag={toggleTag}
               allTags={allTags}
-                dimDone={filters.tags.size === 0}
+              dimDone={filters.tags.size === 0}
             />
           ))}
         </div>
       ) : (
         readingItems.length === 0 && (
           <div className="empty-state">
-            <h2>{items.length > 0 ? 'No books match the filter' : 'The shelf is bare'}</h2>
-            <p>
-              {items.length > 0
-                ? 'Try clearing a filter.'
-                : 'Search above to check out your first book.'}
-            </p>
+            <h2>Nothing saved yet</h2>
+            <p>Paste a link above to add your first article.</p>
           </div>
         )
       )}

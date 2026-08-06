@@ -21,6 +21,7 @@ export default function TicketGrid({
   onToggleTag,
   allTags,
   inWatchingSection,
+  dimDone,
 }) {
   return (
     <div className="media-grid-h">
@@ -34,6 +35,7 @@ export default function TicketGrid({
           onToggleTag={onToggleTag}
           allTags={allTags}
           inWatchingSection={inWatchingSection}
+          dimDone={dimDone}
         />
       ))}
     </div>

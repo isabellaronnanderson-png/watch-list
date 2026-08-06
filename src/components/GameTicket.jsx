@@ -5,11 +5,11 @@ import TagMenu from './TagMenu'
 const LABELS = { want: 'Want', playing: 'Playing', played: 'Played' }
 const MODE_LABELS = { singleplayer: 'Singleplayer', multiplayer: 'Multiplayer' }
 
-export default function GameTicket({ item, onSetStatus, onRemove, onToggleTag, allTags }) {
+export default function GameTicket({ item, onSetStatus, onRemove, onToggleTag, allTags, dimDone = true }) {
   const tags = item.tags || []
 
   return (
-    <article className={`media-card${item.status === 'played' ? ' is-done' : ''}`}>
+    <article className={`media-card${item.status === 'played' && dimDone ? ' is-done' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}
