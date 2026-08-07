@@ -12,7 +12,7 @@ export default function App() {
   const [tab, setTab] = useState('watch')
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell tab-${tab}`}>
       <SiteHeader />
       <TabNav active={tab} onChange={setTab} />
       {tab === 'watch' && <WatchTab />}

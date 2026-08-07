@@ -10,6 +10,33 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 
   --accent: #111111;
+  --tab-accent: #111111;
+  --tab-accent-rgb: 17, 17, 17;
+}
+
+.tab-watch {
+  --tab-accent: #ff073a;
+  --tab-accent-rgb: 255, 7, 58;
+}
+.tab-read {
+  --tab-accent: #ff8c00;
+  --tab-accent-rgb: 255, 140, 0;
+}
+.tab-articles {
+  --tab-accent: #ccd400;
+  --tab-accent-rgb: 204, 212, 0;
+}
+.tab-listen {
+  --tab-accent: #39ff14;
+  --tab-accent-rgb: 57, 255, 20;
+}
+.tab-games {
+  --tab-accent: #00c8d4;
+  --tab-accent-rgb: 0, 200, 212;
+}
+.tab-watchlater {
+  --tab-accent: #bc13fe;
+  --tab-accent-rgb: 188, 19, 254;
 }
 
 * {
@@ -90,8 +117,8 @@ input:focus-visible,
 .masthead-link.is-active,
 .masthead-link:hover {
   color: var(--text);
-  border-top-color: var(--accent);
-  border-right-color: var(--accent);
+  border-top-color: var(--tab-accent);
+  border-right-color: var(--tab-accent);
 }
 
 /* ---------- Site header ---------- */
@@ -487,7 +514,7 @@ input:focus-visible,
 }
 
 .section-heading-highlight {
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--tab-accent);
 }
 
 .section-divider {
@@ -523,7 +550,7 @@ input:focus-visible,
 }
 
 .media-card:hover {
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08), 0 4px 18px rgba(var(--tab-accent-rgb), 0.28);
   transform: translateY(-2px);
 }
 
@@ -758,7 +785,7 @@ input:focus-visible,
   letter-spacing: 0.02em;
   text-transform: uppercase;
   color: var(--text-muted);
-  border: 1px solid var(--border);
+  border: 1px solid rgba(var(--tab-accent-rgb), 0.55);
   background: var(--surface-alt);
   border-radius: 999px;
   padding: 2px 7px;

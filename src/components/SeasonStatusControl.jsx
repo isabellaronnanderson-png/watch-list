@@ -18,7 +18,7 @@ export default function SeasonStatusControl({ seasons, onToggleSeason, onSetStat
   const isFull = watchedCount === total
   const isEmpty = watchedCount === 0
 
-  let label = 'Want'
+  let label = 'Watching'
   if (!isEmpty && !isFull) label = `${watchedCount}/${total} watched`
   if (isFull) label = 'Watched'
 
