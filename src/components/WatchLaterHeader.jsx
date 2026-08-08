@@ -28,8 +28,7 @@ export default function WatchLaterHeader({ onAdd, existingIds }) {
   }
 
   return (
-    <>
-
+    <div className="search-section">
       <form className="search-bar" onSubmit={handleSubmit}>
         <div className="search-bar-row">
           <input
@@ -45,6 +44,6 @@ export default function WatchLaterHeader({ onAdd, existingIds }) {
         </div>
       </form>
       {status === 'error' && <p className="results-error">{errorMsg}</p>}
-    </>
+    </div>
   )
 }

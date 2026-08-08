@@ -10,6 +10,11 @@ export default function ReadHeader({ onAdd, existingIds }) {
   const debounceRef = useRef(null)
   const containerRef = useRef(null)
 
+  const [showManualForm, setShowManualForm] = useState(false)
+  const [manualTitle, setManualTitle] = useState('')
+  const [manualAuthor, setManualAuthor] = useState('')
+  const [manualYear, setManualYear] = useState('')
+
   useEffect(() => {
     function handleClickOutside(e) {
       if (containerRef.current && !containerRef.current.contains(e.target)) {
@@ -55,9 +60,26 @@ export default function ReadHeader({ onAdd, existingIds }) {
     // Results list stays open so multiple books (e.g. a series) can be added in a row.
   }
 
-  return (
-    <>
+  function handleManualSubmit(e) {
+    e.preventDefault()
+    if (!manualTitle.trim()) return
+    onAdd({
+      id: `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      title: manualTitle.trim(),
+      author: manualAuthor.trim() || 'Unknown author',
+      year: manualYear.trim() || null,
+      coverUrl: null,
+      pageCount: null,
+      genres: [],
+    })
+    setManualTitle('')
+    setManualAuthor('')
+    setManualYear('')
+    setShowManualForm(false)
+  }
 
+  return (
+    <div className="search-section">
       <div className="search-bar" ref={containerRef}>
         <input
           type="text"
@@ -116,6 +138,37 @@ export default function ReadHeader({ onAdd, existingIds }) {
           </div>
         )}
       </div>
-    </>
+
+      <button className="custom-add-toggle" onClick={() => setShowManualForm((v) => !v)}>
+        {showManualForm ? '× Cancel' : '+ Add manually'}
+      </button>
+
+      {showManualForm && (
+        <form className="custom-add-form" onSubmit={handleManualSubmit}>
+          <input
+            type="text"
+            placeholder="Title"
+            value={manualTitle}
+            onChange={(e) => setManualTitle(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            placeholder="Author (optional)"
+            value={manualAuthor}
+            onChange={(e) => setManualAuthor(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Year (optional)"
+            value={manualYear}
+            onChange={(e) => setManualYear(e.target.value)}
+          />
+          <button type="submit" className="result-add" style={{ alignSelf: 'flex-start' }}>
+            Add to shelf
+          </button>
+        </form>
+      )}
+    </div>
   )
 }

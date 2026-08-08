@@ -53,7 +53,7 @@ export default function ArticlesHeader({ onAdd, existingIds }) {
   }
 
   return (
-    <>
+    <div className="search-section">
       <form className="search-bar" onSubmit={handleSubmit}>
         <div className="search-bar-row">
           <input
@@ -71,7 +71,7 @@ export default function ArticlesHeader({ onAdd, existingIds }) {
       </form>
 
       <button className="custom-add-toggle" onClick={() => setShowManualForm((v) => !v)}>
-        {showManualForm ? '× Cancel' : "+ Add manually (if a link won't ingest)"}
+        {showManualForm ? '× Cancel' : '+ Add manually'}
       </button>
 
       {showManualForm && (
@@ -101,6 +101,6 @@ export default function ArticlesHeader({ onAdd, existingIds }) {
           </button>
         </form>
       )}
-    </>
+    </div>
   )
 }

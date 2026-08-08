@@ -15,28 +15,28 @@
 }
 
 .tab-watch {
-  --tab-accent: #ff073a;
-  --tab-accent-rgb: 255, 7, 58;
+  --tab-accent: #1f3fbf;
+  --tab-accent-rgb: 31, 63, 191;
 }
 .tab-read {
-  --tab-accent: #ff8c00;
-  --tab-accent-rgb: 255, 140, 0;
+  --tab-accent: #f2c400;
+  --tab-accent-rgb: 242, 196, 0;
 }
 .tab-articles {
-  --tab-accent: #ccd400;
-  --tab-accent-rgb: 204, 212, 0;
+  --tab-accent: #3fae49;
+  --tab-accent-rgb: 63, 174, 73;
 }
 .tab-listen {
-  --tab-accent: #39ff14;
-  --tab-accent-rgb: 57, 255, 20;
+  --tab-accent: #4ec3e0;
+  --tab-accent-rgb: 78, 195, 224;
 }
 .tab-games {
-  --tab-accent: #00c8d4;
-  --tab-accent-rgb: 0, 200, 212;
+  --tab-accent: #8b2fc9;
+  --tab-accent-rgb: 139, 47, 201;
 }
 .tab-watchlater {
-  --tab-accent: #bc13fe;
-  --tab-accent-rgb: 188, 19, 254;
+  --tab-accent: #e5342a;
+  --tab-accent-rgb: 229, 52, 42;
 }
 
 * {
@@ -110,15 +110,15 @@ input:focus-visible,
   padding: 8px 16px;
   cursor: pointer;
   border: none;
-  border-top: 2px solid transparent;
-  border-right: 2px solid transparent;
+  border-top: 2px solid rgba(var(--btn-accent-rgb), 0.35);
+  border-right: 2px solid rgba(var(--btn-accent-rgb), 0.35);
 }
 
 .masthead-link.is-active,
 .masthead-link:hover {
   color: var(--text);
-  border-top-color: var(--tab-accent);
-  border-right-color: var(--tab-accent);
+  border-top-color: var(--btn-accent);
+  border-right-color: var(--btn-accent);
 }
 
 /* ---------- Site header ---------- */
@@ -147,11 +147,25 @@ input:focus-visible,
   margin: 0;
 }
 
+.color-bar {
+  display: flex;
+  height: 8px;
+  margin-top: 14px;
+}
+
+.color-bar span {
+  flex: 1;
+}
+
 /* ---------- Search bar ---------- */
+
+.search-section {
+  margin: 32px 0 28px;
+}
 
 .search-bar {
   position: relative;
-  margin: 32px 0 28px;
+  margin: 0 0 8px;
 }
 
 .search-bar-row {
@@ -545,13 +559,11 @@ input:focus-visible,
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 8px;
-  overflow: hidden;
-  transition: box-shadow 0.15s ease, transform 0.15s ease, opacity 0.2s ease;
+  transition: border-color 0.15s ease, opacity 0.2s ease;
 }
 
 .media-card:hover {
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.08), 0 4px 18px rgba(var(--tab-accent-rgb), 0.28);
-  transform: translateY(-2px);
+  border-color: var(--tab-accent);
 }
 
 .media-card.is-done {
@@ -568,6 +580,7 @@ input:focus-visible,
   width: 120px;
   aspect-ratio: auto;
   flex-shrink: 0;
+  border-radius: 8px 0 0 8px;
 }
 
 .media-card-h .media-card-perforation {
@@ -590,6 +603,7 @@ input:focus-visible,
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  border-radius: 8px 8px 0 0;
 }
 
 .media-card-cover img {

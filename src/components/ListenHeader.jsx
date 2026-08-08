@@ -76,8 +76,7 @@ export default function ListenHeader({ onAdd, existingIds }) {
   }
 
   return (
-    <>
-
+    <div className="search-section">
       <div className="search-bar" ref={containerRef}>
         <input
           type="text"
@@ -164,6 +163,6 @@ export default function ListenHeader({ onAdd, existingIds }) {
           </button>
         </form>
       )}
-    </>
+    </div>
   )
 }
