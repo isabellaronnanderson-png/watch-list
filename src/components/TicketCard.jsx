@@ -22,7 +22,7 @@ export default function TicketCard({
   const tags = item.tags || []
 
   return (
-    <article className={`media-card media-card-h${item.status === 'watched' && dimDone ? ' is-done' : ''}`}>
+    <article id={item.id} className={`media-card media-card-h${item.status === 'watched' && dimDone ? ' is-done' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}

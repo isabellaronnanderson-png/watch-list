@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchBooks } from '../api/googleBooks'
+import { scrollToItem } from '../utils/scrollToItem'
 
 export default function ReadHeader({ onAdd, existingIds }) {
   const [query, setQuery] = useState('')
@@ -102,17 +103,27 @@ export default function ReadHeader({ onAdd, existingIds }) {
               results.map((book) => {
                 const id = `book-${book.id}`
                 const already = existingIds.has(id)
+
+                function handleRowClick() {
+                  if (already) {
+                    setShowResults(false)
+                    scrollToItem(id)
+                  } else {
+                    handleAdd(book)
+                  }
+                }
+
                 return (
                   <div
-                    className={`result-row${already ? ' is-disabled' : ''}`}
+                    className={`result-row${already ? ' is-added' : ''}`}
                     key={id}
                     role="button"
-                    tabIndex={already ? -1 : 0}
-                    onClick={() => !already && handleAdd(book)}
+                    tabIndex={0}
+                    onClick={handleRowClick}
                     onKeyDown={(e) => {
-                      if (!already && (e.key === 'Enter' || e.key === ' ')) {
+                      if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault()
-                        handleAdd(book)
+                        handleRowClick()
                       }
                     }}
                   >
@@ -128,7 +139,7 @@ export default function ReadHeader({ onAdd, existingIds }) {
                         {book.year ? ` · ${book.year}` : ''}
                       </div>
                     </div>
-                    <span className="result-add">{already ? 'Added' : 'Add'}</span>
+                    <span className="result-add">{already ? 'Show in library' : 'Add'}</span>
                   </div>
                 )
               })}

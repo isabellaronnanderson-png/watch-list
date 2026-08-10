@@ -13,7 +13,7 @@ export default function ListenTile({ item, onSetStatus, onRemove, onToggleTag, a
   const tags = item.tags || []
 
   return (
-    <article className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}`}>
+    <article id={item.id} className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}

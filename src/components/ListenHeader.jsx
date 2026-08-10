@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchBooks } from '../api/googleBooks'
+import { scrollToItem } from '../utils/scrollToItem'
 
 export default function ListenHeader({ onAdd, existingIds }) {
   const [query, setQuery] = useState('')
@@ -99,17 +100,27 @@ export default function ListenHeader({ onAdd, existingIds }) {
               results.map((book) => {
                 const id = `audio-${book.id}`
                 const already = existingIds.has(id)
+
+                function handleRowClick() {
+                  if (already) {
+                    setShowResults(false)
+                    scrollToItem(id)
+                  } else {
+                    handleAddAudiobook(book)
+                  }
+                }
+
                 return (
                   <div
-                    className={`result-row${already ? ' is-disabled' : ''}`}
+                    className={`result-row${already ? ' is-added' : ''}`}
                     key={id}
                     role="button"
-                    tabIndex={already ? -1 : 0}
-                    onClick={() => !already && handleAddAudiobook(book)}
+                    tabIndex={0}
+                    onClick={handleRowClick}
                     onKeyDown={(e) => {
-                      if (!already && (e.key === 'Enter' || e.key === ' ')) {
+                      if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault()
-                        handleAddAudiobook(book)
+                        handleRowClick()
                       }
                     }}
                   >
@@ -122,7 +133,7 @@ export default function ListenHeader({ onAdd, existingIds }) {
                       <div className="result-title">{book.title}</div>
                       <div className="result-meta">{book.author}</div>
                     </div>
-                    <span className="result-add">{already ? 'Added' : 'Add'}</span>
+                    <span className="result-add">{already ? 'Show in library' : 'Add'}</span>
                   </div>
                 )
               })}

@@ -106,17 +106,16 @@ input:focus-visible,
   letter-spacing: 0.03em;
   text-transform: uppercase;
   background: transparent;
-  color: var(--text-faint);
+  color: var(--text);
   padding: 8px 16px;
   cursor: pointer;
   border: none;
-  border-top: 2px solid rgba(var(--btn-accent-rgb), 0.35);
-  border-right: 2px solid rgba(var(--btn-accent-rgb), 0.35);
+  border-top: 2px solid transparent;
+  border-right: 2px solid transparent;
 }
 
 .masthead-link.is-active,
 .masthead-link:hover {
-  color: var(--text);
   border-top-color: var(--btn-accent);
   border-right-color: var(--btn-accent);
 }
@@ -260,6 +259,10 @@ input:focus-visible,
   cursor: default;
 }
 
+.result-row.is-added:hover {
+  background: var(--surface-alt);
+}
+
 .result-row img {
   width: 34px;
   height: 51px;
@@ -305,6 +308,12 @@ input:focus-visible,
 
 .result-row.is-disabled .result-add {
   background: #ccc;
+}
+
+.result-row.is-added .result-add {
+  background: transparent;
+  border: 1px solid var(--text-faint);
+  color: var(--text-muted);
 }
 
 .results-status {
@@ -568,6 +577,19 @@ input:focus-visible,
 
 .media-card.is-done {
   opacity: 0.5;
+}
+
+@keyframes flash-highlight {
+  0% {
+    box-shadow: 0 0 0 4px rgba(var(--tab-accent-rgb), 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(var(--tab-accent-rgb), 0);
+  }
+}
+
+.flash-highlight {
+  animation: flash-highlight 1.4s ease-out;
 }
 
 /* Horizontal variant: image sits on the side (like a classic ticket stub) - used

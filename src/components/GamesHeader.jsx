@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchGames, getGameDetails } from '../api/rawg'
 import { yearFromDate } from '../utils/format'
+import { scrollToItem } from '../utils/scrollToItem'
 
 export default function GamesHeader({ onAdd, existingIds }) {
   const [query, setQuery] = useState('')
@@ -91,18 +92,29 @@ export default function GamesHeader({ onAdd, existingIds }) {
               results.map((game) => {
                 const id = `game-${game.id}`
                 const already = existingIds.has(id)
-                const disabled = already || addingId === id
+                const isAdding = addingId === id
+
+                function handleRowClick() {
+                  if (isAdding) return
+                  if (already) {
+                    setShowResults(false)
+                    scrollToItem(id)
+                  } else {
+                    handleAdd(game)
+                  }
+                }
+
                 return (
                   <div
-                    className={`result-row${disabled ? ' is-disabled' : ''}`}
+                    className={`result-row${isAdding ? ' is-disabled' : ''}${already ? ' is-added' : ''}`}
                     key={id}
                     role="button"
-                    tabIndex={disabled ? -1 : 0}
-                    onClick={() => !disabled && handleAdd(game)}
+                    tabIndex={isAdding ? -1 : 0}
+                    onClick={handleRowClick}
                     onKeyDown={(e) => {
-                      if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+                      if (!isAdding && (e.key === 'Enter' || e.key === ' ')) {
                         e.preventDefault()
-                        handleAdd(game)
+                        handleRowClick()
                       }
                     }}
                   >
@@ -118,7 +130,7 @@ export default function GamesHeader({ onAdd, existingIds }) {
                       </div>
                     </div>
                     <span className="result-add">
-                      {already ? 'Added' : addingId === id ? 'Adding…' : 'Add'}
+                      {already ? 'Show in library' : isAdding ? 'Adding…' : 'Add'}
                     </span>
                   </div>
                 )

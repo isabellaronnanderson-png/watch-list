@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { searchTitles, searchByDirector, getDetails, getWatchProviders, posterUrl } from '../api/tmdb'
 import { yearFromDate } from '../utils/format'
 import { canonicalizeProvider } from '../utils/providers'
+import { scrollToItem } from '../utils/scrollToItem'
 
 export default function Header({ onAdd, existingIds, genreMaps }) {
   const [query, setQuery] = useState('')
@@ -147,18 +148,29 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
                 const already = existingIds.has(id)
                 const title = r.title || r.name
                 const dateStr = r.release_date || r.first_air_date
-                const disabled = already || addingId === id
+                const isAdding = addingId === id
+
+                function handleRowClick() {
+                  if (isAdding) return
+                  if (already) {
+                    setShowResults(false)
+                    scrollToItem(id)
+                  } else {
+                    handleAdd(r)
+                  }
+                }
+
                 return (
                   <div
-                    className={`result-row${disabled ? ' is-disabled' : ''}`}
+                    className={`result-row${isAdding ? ' is-disabled' : ''}${already ? ' is-added' : ''}`}
                     key={id}
                     role="button"
-                    tabIndex={disabled ? -1 : 0}
-                    onClick={() => !disabled && handleAdd(r)}
+                    tabIndex={isAdding ? -1 : 0}
+                    onClick={handleRowClick}
                     onKeyDown={(e) => {
-                      if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
+                      if (!isAdding && (e.key === 'Enter' || e.key === ' ')) {
                         e.preventDefault()
-                        handleAdd(r)
+                        handleRowClick()
                       }
                     }}
                   >
@@ -175,7 +187,7 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
                       </div>
                     </div>
                     <span className="result-add">
-                      {already ? 'Added' : addingId === id ? 'Adding…' : 'Add'}
+                      {already ? 'Show in library' : isAdding ? 'Adding…' : 'Add'}
                     </span>
                   </div>
                 )
