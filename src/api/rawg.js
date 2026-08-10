@@ -16,7 +16,22 @@ async function get(path, params = {}) {
   Object.entries(params).forEach(([k, v]) => {
     if (v !== undefined && v !== null) url.searchParams.set(k, v)
   })
-  const res = await fetch(url.toString())
+
+  let res
+  try {
+    res = await fetch(url.toString())
+  } catch {
+    // fetch() throws a bare "Failed to fetch" TypeError when the request never
+    // gets a response at all - could be no internet, RAWG's service being down,
+    // or (most commonly for a free-tier key) the request being blocked in a way
+    // that strips CORS headers, which browsers report as a generic network
+    // failure rather than the real status code.
+    throw new Error(
+      "Couldn't reach the game database. If this keeps happening, test your key directly by visiting " +
+        `${BASE}/games?key=${API_KEY}&search=test in a browser tab - if that also fails, the key or RAWG's ` +
+        'service is the issue, not this app.'
+    )
+  }
   if (!res.ok) throw new Error(`RAWG request failed (${res.status})`)
   return res.json()
 }

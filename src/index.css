@@ -146,16 +146,6 @@ input:focus-visible,
   margin: 0;
 }
 
-.color-bar {
-  display: flex;
-  height: 8px;
-  margin-top: 14px;
-}
-
-.color-bar span {
-  flex: 1;
-}
-
 /* ---------- Search bar ---------- */
 
 .search-section {

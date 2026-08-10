@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchGames, getGameDetails } from '../api/rawg'
 import { yearFromDate } from '../utils/format'
-import { scrollToItem } from '../utils/scrollToItem'
+import { closeAndScrollToItem } from '../utils/scrollToItem'
 
 export default function GamesHeader({ onAdd, existingIds }) {
   const [query, setQuery] = useState('')
@@ -97,8 +97,7 @@ export default function GamesHeader({ onAdd, existingIds }) {
                 function handleRowClick() {
                   if (isAdding) return
                   if (already) {
-                    setShowResults(false)
-                    scrollToItem(id)
+                    closeAndScrollToItem(() => setShowResults(false), id)
                   } else {
                     handleAdd(game)
                   }

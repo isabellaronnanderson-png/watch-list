@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import SiteHeader from './components/SiteHeader'
 import TabNav from './components/TabNav'
 import WatchTab from './components/WatchTab'
 import ReadTab from './components/ReadTab'
@@ -33,6 +34,7 @@ export default function App() {
 
   return (
     <div className={`app-shell tab-${tab}`}>
+      <SiteHeader />
       <TabNav active={tab} onChange={handleChange} />
       {tab === 'watch' && <WatchTab />}
       {tab === 'read' && <ReadTab />}

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { searchBooks } from '../api/googleBooks'
-import { scrollToItem } from '../utils/scrollToItem'
+import { closeAndScrollToItem } from '../utils/scrollToItem'
 
 export default function ReadHeader({ onAdd, existingIds }) {
   const [query, setQuery] = useState('')
@@ -106,8 +106,7 @@ export default function ReadHeader({ onAdd, existingIds }) {
 
                 function handleRowClick() {
                   if (already) {
-                    setShowResults(false)
-                    scrollToItem(id)
+                    closeAndScrollToItem(() => setShowResults(false), id)
                   } else {
                     handleAdd(book)
                   }

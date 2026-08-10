@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { searchTitles, searchByDirector, getDetails, getWatchProviders, posterUrl } from '../api/tmdb'
 import { yearFromDate } from '../utils/format'
 import { canonicalizeProvider } from '../utils/providers'
-import { scrollToItem } from '../utils/scrollToItem'
+import { closeAndScrollToItem } from '../utils/scrollToItem'
 
 export default function Header({ onAdd, existingIds, genreMaps }) {
   const [query, setQuery] = useState('')
@@ -153,8 +153,7 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
                 function handleRowClick() {
                   if (isAdding) return
                   if (already) {
-                    setShowResults(false)
-                    scrollToItem(id)
+                    closeAndScrollToItem(() => setShowResults(false), id)
                   } else {
                     handleAdd(r)
                   }
