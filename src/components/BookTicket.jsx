@@ -2,10 +2,11 @@ import { coverUrl as openLibraryCoverUrl } from '../api/openLibrary'
 import { formatPages, READ_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
+import StarRating from './StarRating'
 
 const LABELS = { want: 'Want', reading: 'Reading', read: 'Read' }
 
-export default function BookTicket({ item, onSetStatus, onRemove, onToggleTag, allTags, dimDone = true }) {
+export default function BookTicket({ item, onSetStatus, onRemove, onToggleTag, onSetRating, allTags, dimDone = true }) {
   const cover = item.coverUrl || (item.coverId ? openLibraryCoverUrl(item.coverId, 'M') : null)
   const tags = item.tags || []
 
@@ -48,6 +49,7 @@ export default function BookTicket({ item, onSetStatus, onRemove, onToggleTag, a
           </div>
         )}
         <span className="media-card-runtime">{formatPages(item.pageCount)}</span>
+        <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
         <StatusStub

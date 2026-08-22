@@ -1,11 +1,12 @@
 import { GAME_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
+import StarRating from './StarRating'
 
 const LABELS = { want: 'Want', playing: 'Playing', played: 'Played' }
 const MODE_LABELS = { singleplayer: 'Singleplayer', multiplayer: 'Multiplayer' }
 
-export default function GameTicket({ item, onSetStatus, onRemove, onToggleTag, allTags, dimDone = true }) {
+export default function GameTicket({ item, onSetStatus, onRemove, onToggleTag, onSetRating, allTags, dimDone = true }) {
   const tags = item.tags || []
 
   return (
@@ -66,6 +67,7 @@ export default function GameTicket({ item, onSetStatus, onRemove, onToggleTag, a
         <span className="media-card-runtime">
           {item.playtimeHours ? `~${item.playtimeHours}H` : '— H'}
         </span>
+        <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
         <StatusStub

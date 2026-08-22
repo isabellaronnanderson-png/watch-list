@@ -19,6 +19,7 @@ export default function TicketGrid({
   onToggleSeason,
   onRemove,
   onToggleTag,
+  onSetRating,
   allTags,
   inWatchingSection,
   dimDone,
@@ -33,6 +34,7 @@ export default function TicketGrid({
           onToggleSeason={onToggleSeason}
           onRemove={onRemove}
           onToggleTag={onToggleTag}
+          onSetRating={onSetRating}
           allTags={allTags}
           inWatchingSection={inWatchingSection}
           dimDone={dimDone}

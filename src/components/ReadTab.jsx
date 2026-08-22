@@ -2,13 +2,20 @@ import { useMemo, useState } from 'react'
 import ReadHeader from './ReadHeader'
 import BookTicket from './BookTicket'
 import TagFilterGroup from './TagFilterGroup'
+import RatingFilterGroup from './RatingFilterGroup'
 import { useReadlist } from '../hooks/useReadlist'
 import { READ_STATUSES } from '../utils/format'
 
-const EMPTY_FILTERS = { genres: new Set(), statuses: new Set(), tags: new Set(), sort: 'title' }
+const EMPTY_FILTERS = {
+  genres: new Set(),
+  statuses: new Set(),
+  tags: new Set(),
+  ratings: new Set(),
+  sort: 'title',
+}
 
 export default function ReadTab() {
-  const { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag } = useReadlist()
+  const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useReadlist()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
@@ -36,7 +43,10 @@ export default function ReadTab() {
   }
 
   const hasActiveFilters =
-    filters.genres.size > 0 || filters.statuses.size > 0 || filters.tags.size > 0
+    filters.genres.size > 0 ||
+    filters.statuses.size > 0 ||
+    filters.tags.size > 0 ||
+    filters.ratings.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
@@ -53,6 +63,7 @@ export default function ReadTab() {
         const hasTag = item.tags?.some((t) => filters.tags.has(t))
         if (!hasTag) return false
       }
+      if (filters.ratings.size > 0 && !filters.ratings.has(item.rating)) return false
       return true
     })
     list = [...list].sort((a, b) => {
@@ -113,6 +124,11 @@ export default function ReadTab() {
           onDeleteTag={deleteTag}
         />
 
+        <RatingFilterGroup
+          selectedRatings={filters.ratings}
+          onToggleRating={(r) => toggleSetValue('ratings', r)}
+        />
+
         <div className="filter-group">
           <span className="filter-group-label">Sort</span>
           <select
@@ -145,6 +161,7 @@ export default function ReadTab() {
                 onSetStatus={setStatus}
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
+                onSetRating={setRating}
                 allTags={allTags}
                 dimDone={filters.tags.size === 0}
               />
@@ -167,8 +184,9 @@ export default function ReadTab() {
               onSetStatus={setStatus}
               onRemove={removeItem}
               onToggleTag={toggleTag}
+              onSetRating={setRating}
               allTags={allTags}
-                dimDone={filters.tags.size === 0}
+              dimDone={filters.tags.size === 0}
             />
           ))}
         </div>

@@ -5,6 +5,7 @@ import StatusStub from './StatusStub'
 import SeasonStatusControl from './SeasonStatusControl'
 import TvStatusControl from './TvStatusControl'
 import TagMenu from './TagMenu'
+import StarRating from './StarRating'
 
 const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
 
@@ -14,6 +15,7 @@ export default function TicketCard({
   onToggleSeason,
   onRemove,
   onToggleTag,
+  onSetRating,
   allTags,
   inWatchingSection,
   dimDone = true,
@@ -74,6 +76,7 @@ export default function TicketCard({
           )}
         </div>
         <span className="media-card-runtime">{formatRuntime(item.runtimeMinutes)}</span>
+        <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
         {isTv && inWatchingSection && (

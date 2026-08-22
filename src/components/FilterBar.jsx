@@ -1,6 +1,7 @@
 import { RUNTIME_BUCKETS, MEDIA_TYPES, WATCH_STATUSES } from '../utils/format'
 import { ALL_PROVIDER_FILTER_OPTIONS } from '../utils/providers'
 import TagFilterGroup from './TagFilterGroup'
+import RatingFilterGroup from './RatingFilterGroup'
 
 export default function FilterBar({
   allGenres,
@@ -14,6 +15,7 @@ export default function FilterBar({
   onToggleTag,
   onRenameTag,
   onDeleteTag,
+  onToggleRating,
   onSortChange,
   onClear,
   hasActiveFilters,
@@ -78,6 +80,8 @@ export default function FilterBar({
         onRenameTag={onRenameTag}
         onDeleteTag={onDeleteTag}
       />
+
+      <RatingFilterGroup selectedRatings={filters.ratings} onToggleRating={onToggleRating} />
 
       <div className="filter-group">
         <span className="filter-group-label">Runtime</span>

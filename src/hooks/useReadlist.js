@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { makeTagActions } from './tagHelpers'
+import { makeRatingActions } from './ratingHelpers'
 
 const STORAGE_KEY = 'marquee-watchlist:books'
 
@@ -9,6 +10,7 @@ function migrateItem(item) {
     migrated.status = migrated.read ? 'read' : 'want'
   }
   if (!Array.isArray(migrated.tags)) migrated.tags = []
+  if (typeof migrated.rating !== 'number') migrated.rating = 0
   delete migrated.read
   return migrated
 }
@@ -33,7 +35,7 @@ export function useReadlist() {
   const addItem = useCallback((item) => {
     setItems((prev) => {
       if (prev.some((p) => p.id === item.id)) return prev
-      return [{ ...item, status: 'want', tags: [], addedAt: Date.now() }, ...prev]
+      return [{ ...item, status: 'want', tags: [], rating: 0, addedAt: Date.now() }, ...prev]
     })
   }, [])
 
@@ -46,6 +48,7 @@ export function useReadlist() {
   }, [])
 
   const { toggleTag, renameTag, deleteTag } = useMemo(() => makeTagActions(setItems), [])
+  const { setRating } = useMemo(() => makeRatingActions(setItems), [])
 
-  return { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag }
+  return { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag }
 }

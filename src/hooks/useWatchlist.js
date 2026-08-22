@@ -25,6 +25,7 @@ function migrateItem(item) {
   }
   if (!migrated.providerIds) migrated.providerIds = []
   if (!Array.isArray(migrated.tags)) migrated.tags = []
+  if (typeof migrated.rating !== 'number') migrated.rating = 0
 
   // Re-seed per-season tracking for TV shows that predate it (or lost it in an
   // earlier migration). We don't know the true per-season history, so: shows
@@ -65,7 +66,7 @@ export function useWatchlist() {
         item.mediaType === 'tv' && item.numberOfSeasons > 0
           ? Array(item.numberOfSeasons).fill(false)
           : null
-      return [{ ...item, status: 'want', seasons, tags: [], addedAt: Date.now() }, ...prev]
+      return [{ ...item, status: 'want', seasons, tags: [], rating: 0, addedAt: Date.now() }, ...prev]
     })
   }, [])
 
@@ -113,6 +114,10 @@ export function useWatchlist() {
     setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
   }, [])
 
+  const setRating = useCallback((id, rating) => {
+    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, rating } : p)))
+  }, [])
+
   // TV shows: toggle one season, status is derived from how many are checked.
   const toggleSeason = useCallback((id, seasonIndex) => {
     setItems((prev) =>
@@ -142,6 +147,7 @@ export function useWatchlist() {
     addItem,
     removeItem,
     setStatus,
+    setRating,
     toggleSeason,
     updateSeasonCount,
     toggleTag,

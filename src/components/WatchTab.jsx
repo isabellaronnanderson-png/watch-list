@@ -13,6 +13,7 @@ const EMPTY_FILTERS = {
   mediaTypes: new Set(),
   statuses: new Set(),
   tags: new Set(),
+  ratings: new Set(),
   sort: 'title',
 }
 
@@ -22,6 +23,7 @@ export default function WatchTab() {
     addItem,
     removeItem,
     setStatus,
+    setRating,
     toggleSeason,
     updateSeasonCount,
     toggleTag,
@@ -94,7 +96,8 @@ export default function WatchTab() {
     filters.providers.size > 0 ||
     filters.mediaTypes.size > 0 ||
     filters.statuses.size > 0 ||
-    filters.tags.size > 0
+    filters.tags.size > 0 ||
+    filters.ratings.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
@@ -127,6 +130,7 @@ export default function WatchTab() {
         const hasProvider = item.providerIds?.some((pid) => filters.providers.has(pid))
         if (!hasProvider) return false
       }
+      if (filters.ratings.size > 0 && !filters.ratings.has(item.rating)) return false
       return true
     })
 
@@ -166,6 +170,7 @@ export default function WatchTab() {
         onToggleTag={(t) => toggleSetValue('tags', t)}
         onRenameTag={renameTag}
         onDeleteTag={deleteTag}
+        onToggleRating={(r) => toggleSetValue('ratings', r)}
         onSortChange={(sort) => setFilters((prev) => ({ ...prev, sort }))}
         onClear={() => setFilters(EMPTY_FILTERS)}
         hasActiveFilters={hasActiveFilters}
@@ -182,6 +187,7 @@ export default function WatchTab() {
             onToggleSeason={toggleSeason}
             onRemove={removeItem}
             onToggleTag={toggleTag}
+            onSetRating={setRating}
             allTags={allTags}
             inWatchingSection
             dimDone={filters.tags.size === 0}
@@ -201,6 +207,7 @@ export default function WatchTab() {
           onToggleSeason={toggleSeason}
           onRemove={removeItem}
           onToggleTag={toggleTag}
+          onSetRating={setRating}
           allTags={allTags}
           dimDone={filters.tags.size === 0}
         />

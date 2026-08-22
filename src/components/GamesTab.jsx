@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import GamesHeader from './GamesHeader'
 import GameTicket from './GameTicket'
 import TagFilterGroup from './TagFilterGroup'
+import RatingFilterGroup from './RatingFilterGroup'
 import { useGameslist } from '../hooks/useGameslist'
 import { GAME_STATUSES, LENGTH_BUCKETS, GAME_MODES } from '../utils/format'
 
@@ -12,11 +13,12 @@ const EMPTY_FILTERS = {
   lengths: new Set(),
   modes: new Set(),
   tags: new Set(),
+  ratings: new Set(),
   sort: 'title',
 }
 
 export default function GamesTab() {
-  const { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag } = useGameslist()
+  const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useGameslist()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
@@ -55,7 +57,8 @@ export default function GamesTab() {
     filters.platforms.size > 0 ||
     filters.lengths.size > 0 ||
     filters.modes.size > 0 ||
-    filters.tags.size > 0
+    filters.tags.size > 0 ||
+    filters.ratings.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
@@ -69,6 +72,7 @@ export default function GamesTab() {
         return false
       if (filters.modes.size > 0 && !item.modes?.some((m) => filters.modes.has(m))) return false
       if (filters.tags.size > 0 && !item.tags?.some((t) => filters.tags.has(t))) return false
+      if (filters.ratings.size > 0 && !filters.ratings.has(item.rating)) return false
       if (filters.lengths.size > 0) {
         const bucketMatch = LENGTH_BUCKETS.some(
           (b) => filters.lengths.has(b.id) && b.test(item.playtimeHours)
@@ -154,6 +158,11 @@ export default function GamesTab() {
           onDeleteTag={deleteTag}
         />
 
+        <RatingFilterGroup
+          selectedRatings={filters.ratings}
+          onToggleRating={(r) => toggleSetValue('ratings', r)}
+        />
+
         <div className="filter-group">
           <span className="filter-group-label">Length</span>
           <div className="chip-row">
@@ -218,6 +227,7 @@ export default function GamesTab() {
                 onSetStatus={setStatus}
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
+                onSetRating={setRating}
                 allTags={allTags}
                 dimDone={filters.tags.size === 0}
               />
@@ -240,8 +250,9 @@ export default function GamesTab() {
               onSetStatus={setStatus}
               onRemove={removeItem}
               onToggleTag={toggleTag}
+              onSetRating={setRating}
               allTags={allTags}
-                dimDone={filters.tags.size === 0}
+              dimDone={filters.tags.size === 0}
             />
           ))}
         </div>

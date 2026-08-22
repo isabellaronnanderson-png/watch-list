@@ -2,13 +2,14 @@ import { useMemo, useState } from 'react'
 import WatchLaterHeader from './WatchLaterHeader'
 import WatchLaterTile from './WatchLaterTile'
 import TagFilterGroup from './TagFilterGroup'
+import RatingFilterGroup from './RatingFilterGroup'
 import { useWatchLater } from '../hooks/useWatchLater'
 import { WATCH_STATUSES } from '../utils/format'
 
-const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), sort: 'title' }
+const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), ratings: new Set(), sort: 'title' }
 
 export default function WatchLaterTab() {
-  const { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag } = useWatchLater()
+  const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useWatchLater()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
@@ -38,7 +39,17 @@ export default function WatchLaterTab() {
     })
   }
 
-  const hasActiveFilters = filters.statuses.size > 0 || filters.tags.size > 0
+  function toggleRatingFilter(r) {
+    setFilters((prev) => {
+      const next = new Set(prev.ratings)
+      if (next.has(r)) next.delete(r)
+      else next.add(r)
+      return { ...prev, ratings: next }
+    })
+  }
+
+  const hasActiveFilters =
+    filters.statuses.size > 0 || filters.tags.size > 0 || filters.ratings.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
@@ -48,6 +59,7 @@ export default function WatchLaterTab() {
         return false
       }
       if (filters.tags.size > 0 && !item.tags?.some((t) => filters.tags.has(t))) return false
+      if (filters.ratings.size > 0 && !filters.ratings.has(item.rating)) return false
       return true
     })
     list = [...list].sort((a, b) => {
@@ -89,6 +101,8 @@ export default function WatchLaterTab() {
           onDeleteTag={deleteTag}
         />
 
+        <RatingFilterGroup selectedRatings={filters.ratings} onToggleRating={toggleRatingFilter} />
+
         <div className="filter-group">
           <span className="filter-group-label">Sort</span>
           <select
@@ -121,6 +135,7 @@ export default function WatchLaterTab() {
                 onSetStatus={setStatus}
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
+                onSetRating={setRating}
                 allTags={allTags}
                 dimDone={filters.tags.size === 0}
               />
@@ -143,8 +158,9 @@ export default function WatchLaterTab() {
               onSetStatus={setStatus}
               onRemove={removeItem}
               onToggleTag={toggleTag}
+              onSetRating={setRating}
               allTags={allTags}
-                dimDone={filters.tags.size === 0}
+              dimDone={filters.tags.size === 0}
             />
           ))}
         </div>

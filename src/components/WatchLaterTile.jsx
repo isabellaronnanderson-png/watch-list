@@ -1,10 +1,11 @@
 import { WATCH_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
+import StarRating from './StarRating'
 
 const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
 
-export default function WatchLaterTile({ item, onSetStatus, onRemove, onToggleTag, allTags, dimDone = true }) {
+export default function WatchLaterTile({ item, onSetStatus, onRemove, onToggleTag, onSetRating, allTags, dimDone = true }) {
   const tags = item.tags || []
 
   return (
@@ -40,6 +41,7 @@ export default function WatchLaterTile({ item, onSetStatus, onRemove, onToggleTa
             ))}
           </div>
         )}
+        <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
         <StatusStub

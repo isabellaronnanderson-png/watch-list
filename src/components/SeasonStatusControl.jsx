@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { burstConfetti } from '../utils/confetti'
 
 export default function SeasonStatusControl({ seasons, onToggleSeason, onSetStatus }) {
   const [open, setOpen] = useState(false)
@@ -36,7 +37,18 @@ export default function SeasonStatusControl({ seasons, onToggleSeason, onSetStat
         <div className="season-dropdown">
           {seasons.map((watched, i) => (
             <label key={i} className="season-dropdown-row">
-              <input type="checkbox" checked={watched} onChange={() => onToggleSeason(i)} />
+              <input
+                type="checkbox"
+                checked={watched}
+                onChange={(e) => {
+                  const willComplete = !watched && seasons.every((s, idx) => (idx === i ? true : s))
+                  if (willComplete) {
+                    const rect = e.target.getBoundingClientRect()
+                    burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2)
+                  }
+                  onToggleSeason(i)
+                }}
+              />
               Season {i + 1}
             </label>
           ))}
