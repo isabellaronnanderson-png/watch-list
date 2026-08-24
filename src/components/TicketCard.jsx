@@ -84,6 +84,8 @@ export default function TicketCard({
             seasons={item.seasons}
             onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
             onSetStatus={(s) => onSetStatus(item.id, s)}
+            rating={item.rating}
+            onSetRating={(r) => onSetRating(item.id, r)}
           />
         )}
         {isTv && !inWatchingSection && (
@@ -92,6 +94,8 @@ export default function TicketCard({
             seasons={item.seasons}
             onSetStatus={(s) => onSetStatus(item.id, s)}
             onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
+            rating={item.rating}
+            onSetRating={(r) => onSetRating(item.id, r)}
           />
         )}
         {!isTv && (
@@ -100,6 +104,8 @@ export default function TicketCard({
             status={item.status}
             onSetStatus={(s) => onSetStatus(item.id, s)}
             labels={LABELS}
+            rating={item.rating}
+            onSetRating={(r) => onSetRating(item.id, r)}
           />
         )}
       </div>

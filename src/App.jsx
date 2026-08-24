@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import SiteHeader from './components/SiteHeader'
 import TabNav from './components/TabNav'
+import RatingPromptToast from './components/RatingPromptToast'
 import WatchTab from './components/WatchTab'
 import ReadTab from './components/ReadTab'
 import ListenTab from './components/ListenTab'
@@ -42,6 +43,7 @@ export default function App() {
       {tab === 'games' && <GamesTab />}
       {tab === 'watchlater' && <WatchLaterTab />}
       {tab === 'articles' && <ArticlesTab />}
+      <RatingPromptToast />
     </div>
   )
 }

@@ -57,6 +57,8 @@ export default function BookTicket({ item, onSetStatus, onRemove, onToggleTag, o
           status={item.status}
           onSetStatus={(s) => onSetStatus(item.id, s)}
           labels={LABELS}
+          rating={item.rating}
+          onSetRating={(r) => onSetRating(item.id, r)}
         />
       </div>
     </article>

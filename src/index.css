@@ -609,6 +609,60 @@ input:focus-visible,
   animation: confetti-burst 0.75s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
 }
 
+.rating-prompt {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  padding: 10px 14px;
+  animation: rating-prompt-in 0.18s ease-out;
+}
+
+@keyframes rating-prompt-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rating-prompt span {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.rating-prompt .star-rating {
+  margin-top: 0;
+}
+
+.rating-prompt .star-btn {
+  font-size: 17px;
+}
+
+.rating-prompt-close {
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.rating-prompt-close:hover {
+  color: var(--text);
+}
+
 /* Horizontal variant: image sits on the side (like a classic ticket stub) - used
    for Watch/Read/Listen, since posters and book covers are naturally tall. */
 .media-card-h {
@@ -947,7 +1001,7 @@ input:focus-visible,
   padding: 0;
   font-size: 15px;
   line-height: 1;
-  color: var(--border);
+  color: var(--text-faint);
   cursor: pointer;
   transition: color 0.1s ease, transform 0.1s ease;
 }

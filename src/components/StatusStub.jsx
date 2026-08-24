@@ -1,6 +1,7 @@
 import { burstConfetti } from '../utils/confetti'
+import { showRatingPrompt } from '../utils/ratingPromptStore'
 
-export default function StatusStub({ statuses, status, onSetStatus, labels }) {
+export default function StatusStub({ statuses, status, onSetStatus, labels, rating, onSetRating }) {
   const doneId = statuses[statuses.length - 1].id
 
   return (
@@ -12,6 +13,9 @@ export default function StatusStub({ statuses, status, onSetStatus, labels }) {
           onClick={(e) => {
             if (s.id === doneId && status !== doneId) {
               burstConfetti(e.clientX, e.clientY)
+              if (onSetRating) {
+                showRatingPrompt({ x: e.clientX, y: e.clientY, rating, onSetRating })
+              }
             }
             onSetStatus(s.id)
           }}

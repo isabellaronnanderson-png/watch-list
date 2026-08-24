@@ -3,7 +3,7 @@ export default function RatingFilterGroup({ selectedRatings, onToggleRating }) {
     <div className="filter-group">
       <span className="filter-group-label">Rating</span>
       <div className="chip-row">
-        {[5, 4, 3, 2, 1].map((n) => (
+        {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
             className="chip"
