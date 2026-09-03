@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { makeTagActions } from './tagHelpers'
+import { useAuthContext } from './AuthContext'
+import { useCloudSync } from './useCloudSync'
 import { makeRatingActions } from './ratingHelpers'
 
 const STORAGE_KEY = 'marquee-watchlist:books'
@@ -27,6 +29,9 @@ function load() {
 
 export function useReadlist() {
   const [items, setItems] = useState(load)
+  const { user } = useAuthContext()
+  useCloudSync('read', user, items, setItems)
+
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))

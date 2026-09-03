@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { AuthProvider } from './hooks/AuthContext'
+import AuthGate from './components/AuthGate'
 import SiteHeader from './components/SiteHeader'
 import TabNav from './components/TabNav'
 import RatingPromptToast from './components/RatingPromptToast'
@@ -21,7 +23,7 @@ function loadTab() {
   }
 }
 
-export default function App() {
+function AppShell() {
   const [tab, setTab] = useState(loadTab)
 
   function handleChange(next) {
@@ -45,5 +47,15 @@ export default function App() {
       {tab === 'articles' && <ArticlesTab />}
       <RatingPromptToast />
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AuthGate>
+        <AppShell />
+      </AuthGate>
+    </AuthProvider>
   )
 }

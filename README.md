@@ -21,6 +21,48 @@ progress" section surfaced above the rest of the list.
 
 ## Setup
 
+### Cloud sync (Supabase)
+
+Your lists live in `localStorage` by default, which is wiped if a browser's
+cache/site data is ever cleared. To make them survive that, this app can sync
+to a free Supabase project instead.
+
+1. Create a free project at [supabase.com](https://supabase.com) (no card required).
+2. In the SQL Editor, run:
+   ```sql
+   create table if not exists lists (
+     user_id uuid references auth.users not null,
+     list_key text not null,
+     items jsonb not null default '[]'::jsonb,
+     updated_at timestamptz not null default now(),
+     primary key (user_id, list_key)
+   );
+
+   alter table lists enable row level security;
+
+   create policy "Users can view their own lists"
+     on lists for select
+     using (auth.uid() = user_id);
+
+   create policy "Users can insert their own lists"
+     on lists for insert
+     with check (auth.uid() = user_id);
+
+   create policy "Users can update their own lists"
+     on lists for update
+     using (auth.uid() = user_id);
+   ```
+3. In Project Settings → API, copy the **Project URL** and the **publishable**
+   (formerly "anon") key — the publishable key is safe to use in a browser app.
+4. Add both to `.env` (see below) and to your deploy host's environment variables.
+
+Without these two variables set, the app works exactly as before (local-only,
+no login screen). With them set, a simple email/password login gates the app,
+and every tab's data syncs to that account.
+
+Optional: in Supabase's Authentication settings, you can turn off "Confirm
+email" if you'd rather skip the email-verification step for a personal project.
+
 1. Install dependencies:
    ```bash
    npm install

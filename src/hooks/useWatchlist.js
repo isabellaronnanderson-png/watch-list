@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { canonicalizeProvider } from '../utils/providers'
+import { useAuthContext } from './AuthContext'
+import { useCloudSync } from './useCloudSync'
 
 const STORAGE_KEY = 'marquee-watchlist:items'
 
@@ -54,6 +56,8 @@ function load() {
 
 export function useWatchlist() {
   const [items, setItems] = useState(load)
+  const { user } = useAuthContext()
+  useCloudSync('watch', user, items, setItems)
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
