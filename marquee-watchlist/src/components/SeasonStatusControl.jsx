@@ -1,0 +1,66 @@
+import { useEffect, useRef, useState } from 'react'
+import { burstConfetti } from '../utils/confetti'
+import { showRatingPrompt } from '../utils/ratingPromptStore'
+
+export default function SeasonStatusControl({ seasons, onToggleSeason, onSetStatus, rating, onSetRating }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  const watchedCount = seasons.filter(Boolean).length
+  const total = seasons.length
+  const pct = total > 0 ? Math.round((watchedCount / total) * 100) : 0
+  const isFull = watchedCount === total
+  const isEmpty = watchedCount === 0
+
+  let label = 'Watching'
+  if (!isEmpty && !isFull) label = `${watchedCount}/${total} watched`
+  if (isFull) label = 'Watched'
+
+  return (
+    <div className="season-control" ref={ref}>
+      <button
+        type="button"
+        className={`season-pill${isFull ? ' is-full' : ''}`}
+        style={{ '--fill-pct': `${pct}%` }}
+        onClick={() => setOpen((v) => !v)}
+      >
+        {label}
+      </button>
+      {open && (
+        <div className="season-dropdown">
+          {seasons.map((watched, i) => (
+            <label key={i} className="season-dropdown-row">
+              <input
+                type="checkbox"
+                checked={watched}
+                onChange={(e) => {
+                  const willComplete = !watched && seasons.every((s, idx) => (idx === i ? true : s))
+                  if (willComplete) {
+                    const rect = e.target.getBoundingClientRect()
+                    const x = rect.left + rect.width / 2
+                    const y = rect.top + rect.height / 2
+                    burstConfetti(x, y)
+                    if (onSetRating) showRatingPrompt({ x, y, rating, onSetRating })
+                  }
+                  onToggleSeason(i)
+                }}
+              />
+              Season {i + 1}
+            </label>
+          ))}
+        </div>
+      )}
+      <button type="button" className="season-back-link" onClick={() => onSetStatus('want')}>
+        ← Back to library
+      </button>
+    </div>
+  )
+}
