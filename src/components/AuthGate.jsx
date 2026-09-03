@@ -8,8 +8,8 @@ export default function AuthGate({ children }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [info, setInfo] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [signupComplete, setSignupComplete] = useState(false)
 
   if (!supabaseEnabled) return children
   if (loading) return <div className="auth-screen" />
@@ -18,7 +18,6 @@ export default function AuthGate({ children }) {
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
-    setInfo('')
     if (!email.trim() || !password.trim()) return
     setSubmitting(true)
     const action = mode === 'signup' ? signUp : signIn
@@ -27,8 +26,32 @@ export default function AuthGate({ children }) {
     if (err) {
       setError(err.message)
     } else if (mode === 'signup') {
-      setInfo('Check your email to confirm your account, then sign in.')
+      setSignupComplete(true)
     }
+  }
+
+  function backToSignIn() {
+    setSignupComplete(false)
+    setMode('signin')
+    setPassword('')
+    setError('')
+  }
+
+  if (signupComplete) {
+    return (
+      <div className="auth-screen">
+        <div className="auth-card">
+          <h1 className="auth-title">Check your email</h1>
+          <p className="auth-sub">
+            Your account was created. We've sent a confirmation link to <strong>{email}</strong> —
+            click it, then come back here and sign in.
+          </p>
+          <button type="button" className="auth-submit" onClick={backToSignIn}>
+            Back to sign in
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -59,7 +82,6 @@ export default function AuthGate({ children }) {
             required
           />
           {error && <p className="auth-error">{error}</p>}
-          {info && <p className="auth-info">{info}</p>}
           <button type="submit" className="auth-submit" disabled={submitting}>
             {submitting ? 'Please wait…' : mode === 'signup' ? 'Create account' : 'Sign in'}
           </button>
@@ -70,7 +92,6 @@ export default function AuthGate({ children }) {
           onClick={() => {
             setMode(mode === 'signup' ? 'signin' : 'signup')
             setError('')
-            setInfo('')
           }}
         >
           {mode === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}

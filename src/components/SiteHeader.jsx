@@ -18,9 +18,14 @@ export default function SiteHeader() {
       </div>
       <div className="site-header-right">
         {supabaseEnabled && user && (
-          <button className="backup-toggle" onClick={signOut} title={user.email}>
-            Sign out
-          </button>
+          <>
+            <span className="account-avatar" title={user.email}>
+              {user.email?.[0]?.toUpperCase() || '?'}
+            </span>
+            <button className="backup-toggle" onClick={signOut}>
+              Sign out
+            </button>
+          </>
         )}
         <BackupPanel />
       </div>
