@@ -17,6 +17,7 @@ const EMPTY_FILTERS = {
 export default function ReadTab() {
   const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useReadlist()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
+  const [justCompletedIds, setJustCompletedIds] = useState(new Set())
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
 
@@ -42,6 +43,25 @@ export default function ReadTab() {
     })
   }
 
+  // Marking something done removes it from the default view - but if it
+  // just happened this session, keep it visible (dimmed) until the person
+  // acts on the rating prompt, rather than yanking the card out from under them.
+  function handleSetStatus(id, status) {
+    if (status === 'read') {
+      setJustCompletedIds((prev) => new Set(prev).add(id))
+    }
+    setStatus(id, status)
+  }
+
+  function handleSetRating(id, rating) {
+    setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setRating(id, rating)
+  }
+
   const hasActiveFilters =
     filters.genres.size > 0 ||
     filters.statuses.size > 0 ||
@@ -52,7 +72,7 @@ export default function ReadTab() {
     let list = items.filter((item) => {
       if (filters.statuses.size > 0) {
         if (!filters.statuses.has(item.status)) return false
-      } else if (item.status === 'read' && filters.tags.size === 0) {
+      } else if (item.status === 'read' && filters.tags.size === 0 && !justCompletedIds.has(item.id)) {
         return false
       }
       if (filters.genres.size > 0) {
@@ -71,7 +91,7 @@ export default function ReadTab() {
       return b.addedAt - a.addedAt
     })
     return list
-  }, [items, filters])
+  }, [items, filters, justCompletedIds])
 
   const readingItems = visibleItems.filter((i) => i.status === 'reading')
   const restItems = visibleItems.filter((i) => i.status !== 'reading')
@@ -158,10 +178,10 @@ export default function ReadTab() {
               <BookTicket
                 key={item.id}
                 item={item}
-                onSetStatus={setStatus}
+                onSetStatus={handleSetStatus}
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
-                onSetRating={setRating}
+                onSetRating={handleSetRating}
                 allTags={allTags}
                 dimDone={filters.tags.size === 0}
               />
@@ -181,10 +201,10 @@ export default function ReadTab() {
             <BookTicket
               key={item.id}
               item={item}
-              onSetStatus={setStatus}
+              onSetStatus={handleSetStatus}
               onRemove={removeItem}
               onToggleTag={toggleTag}
-              onSetRating={setRating}
+              onSetRating={handleSetRating}
               allTags={allTags}
               dimDone={filters.tags.size === 0}
             />

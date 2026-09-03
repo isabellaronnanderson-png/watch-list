@@ -33,6 +33,7 @@ export default function WatchTab() {
   const [genreMaps, setGenreMaps] = useState(null)
   const [configError, setConfigError] = useState(null)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
+  const [justCompletedIds, setJustCompletedIds] = useState(new Set())
   const checkedForNewSeasons = useRef(false)
 
   useEffect(() => {
@@ -90,6 +91,36 @@ export default function WatchTab() {
     })
   }
 
+  // Marking something Watched removes it from the default view - but if it
+  // just happened this session, keep it visible (dimmed) until the person
+  // acts on the rating prompt, rather than yanking the card out from under them.
+  function handleSetStatus(id, status) {
+    if (status === 'watched') {
+      setJustCompletedIds((prev) => new Set(prev).add(id))
+    }
+    setStatus(id, status)
+  }
+
+  function handleToggleSeason(id, seasonIndex) {
+    const item = items.find((i) => i.id === id)
+    if (item?.seasons) {
+      const willComplete = !item.seasons[seasonIndex] && item.seasons.every((s, idx) => (idx === seasonIndex ? true : s))
+      if (willComplete) {
+        setJustCompletedIds((prev) => new Set(prev).add(id))
+      }
+    }
+    toggleSeason(id, seasonIndex)
+  }
+
+  function handleSetRating(id, rating) {
+    setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setRating(id, rating)
+  }
+
   const hasActiveFilters =
     filters.genres.size > 0 ||
     filters.runtimes.size > 0 ||
@@ -106,10 +137,15 @@ export default function WatchTab() {
       }
       if (filters.statuses.size > 0) {
         if (!filters.statuses.has(item.status)) return false
-      } else if (item.status === 'watched' && filters.tags.size === 0) {
+      } else if (
+        item.status === 'watched' &&
+        filters.tags.size === 0 &&
+        !justCompletedIds.has(item.id)
+      ) {
         // Finished titles stay out of the way by default; select "Watched" to see
         // them, or filter by a tag - tagged items (rewatch favorites etc.) stay
-        // visible regardless of watched status.
+        // visible regardless of watched status. Items that JUST finished this
+        // session stay visible too, until rated or the prompt is dismissed.
         return false
       }
       if (filters.genres.size > 0) {
@@ -142,7 +178,7 @@ export default function WatchTab() {
     })
 
     return list
-  }, [items, filters])
+  }, [items, filters, justCompletedIds])
 
   const watchingItems = visibleItems.filter((i) => i.status === 'watching')
   const restItems = visibleItems.filter((i) => i.status !== 'watching')
@@ -183,11 +219,11 @@ export default function WatchTab() {
           </p>
           <TicketGrid
             items={watchingItems}
-            onSetStatus={setStatus}
-            onToggleSeason={toggleSeason}
+            onSetStatus={handleSetStatus}
+            onToggleSeason={handleToggleSeason}
             onRemove={removeItem}
             onToggleTag={toggleTag}
-            onSetRating={setRating}
+            onSetRating={handleSetRating}
             allTags={allTags}
             inWatchingSection
             dimDone={filters.tags.size === 0}
@@ -203,11 +239,11 @@ export default function WatchTab() {
       {restItems.length > 0 ? (
         <TicketGrid
           items={restItems}
-          onSetStatus={setStatus}
-          onToggleSeason={toggleSeason}
+          onSetStatus={handleSetStatus}
+          onToggleSeason={handleToggleSeason}
           onRemove={removeItem}
           onToggleTag={toggleTag}
-          onSetRating={setRating}
+          onSetRating={handleSetRating}
           allTags={allTags}
           dimDone={filters.tags.size === 0}
         />

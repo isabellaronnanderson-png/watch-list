@@ -20,6 +20,7 @@ const EMPTY_FILTERS = {
 export default function GamesTab() {
   const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useGameslist()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
+  const [justCompletedIds, setJustCompletedIds] = useState(new Set())
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
 
@@ -51,6 +52,25 @@ export default function GamesTab() {
     })
   }
 
+  // Marking something done removes it from the default view - but if it
+  // just happened this session, keep it visible (dimmed) until the person
+  // acts on the rating prompt, rather than yanking the card out from under them.
+  function handleSetStatus(id, status) {
+    if (status === 'played') {
+      setJustCompletedIds((prev) => new Set(prev).add(id))
+    }
+    setStatus(id, status)
+  }
+
+  function handleSetRating(id, rating) {
+    setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setRating(id, rating)
+  }
+
   const hasActiveFilters =
     filters.statuses.size > 0 ||
     filters.genres.size > 0 ||
@@ -64,7 +84,7 @@ export default function GamesTab() {
     let list = items.filter((item) => {
       if (filters.statuses.size > 0) {
         if (!filters.statuses.has(item.status)) return false
-      } else if (item.status === 'played' && filters.tags.size === 0) {
+      } else if (item.status === 'played' && filters.tags.size === 0 && !justCompletedIds.has(item.id)) {
         return false
       }
       if (filters.genres.size > 0 && !item.genres?.some((g) => filters.genres.has(g))) return false
@@ -86,7 +106,7 @@ export default function GamesTab() {
       return b.addedAt - a.addedAt
     })
     return list
-  }, [items, filters])
+  }, [items, filters, justCompletedIds])
 
   const playingItems = visibleItems.filter((i) => i.status === 'playing')
   const restItems = visibleItems.filter((i) => i.status !== 'playing')
@@ -224,10 +244,10 @@ export default function GamesTab() {
               <GameTicket
                 key={item.id}
                 item={item}
-                onSetStatus={setStatus}
+                onSetStatus={handleSetStatus}
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
-                onSetRating={setRating}
+                onSetRating={handleSetRating}
                 allTags={allTags}
                 dimDone={filters.tags.size === 0}
               />
@@ -247,10 +267,10 @@ export default function GamesTab() {
             <GameTicket
               key={item.id}
               item={item}
-              onSetStatus={setStatus}
+              onSetStatus={handleSetStatus}
               onRemove={removeItem}
               onToggleTag={toggleTag}
-              onSetRating={setRating}
+              onSetRating={handleSetRating}
               allTags={allTags}
               dimDone={filters.tags.size === 0}
             />

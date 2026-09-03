@@ -40,7 +40,9 @@ export default function TicketCard({
         {item.posterPath ? (
           <img src={posterUrl(item.posterPath, 'w342')} alt="" />
         ) : (
-          <div className="media-card-cover-empty" />
+          <div className="media-card-cover-empty media-card-cover-fallback">
+            <span>{item.title}</span>
+          </div>
         )}
       </div>
 

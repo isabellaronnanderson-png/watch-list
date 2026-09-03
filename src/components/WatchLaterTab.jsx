@@ -11,6 +11,7 @@ const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), ratings: new Set()
 export default function WatchLaterTab() {
   const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useWatchLater()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
+  const [justCompletedIds, setJustCompletedIds] = useState(new Set())
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
 
@@ -48,6 +49,22 @@ export default function WatchLaterTab() {
     })
   }
 
+  function handleSetStatus(id, status) {
+    if (status === 'watched') {
+      setJustCompletedIds((prev) => new Set(prev).add(id))
+    }
+    setStatus(id, status)
+  }
+
+  function handleSetRating(id, rating) {
+    setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setRating(id, rating)
+  }
+
   const hasActiveFilters =
     filters.statuses.size > 0 || filters.tags.size > 0 || filters.ratings.size > 0
 
@@ -55,7 +72,7 @@ export default function WatchLaterTab() {
     let list = items.filter((item) => {
       if (filters.statuses.size > 0) {
         if (!filters.statuses.has(item.status)) return false
-      } else if (item.status === 'watched' && filters.tags.size === 0) {
+      } else if (item.status === 'watched' && filters.tags.size === 0 && !justCompletedIds.has(item.id)) {
         return false
       }
       if (filters.tags.size > 0 && !item.tags?.some((t) => filters.tags.has(t))) return false
@@ -67,7 +84,7 @@ export default function WatchLaterTab() {
       return b.addedAt - a.addedAt
     })
     return list
-  }, [items, filters])
+  }, [items, filters, justCompletedIds])
 
   const watchingItems = visibleItems.filter((i) => i.status === 'watching')
   const restItems = visibleItems.filter((i) => i.status !== 'watching')
@@ -132,10 +149,10 @@ export default function WatchLaterTab() {
               <WatchLaterTile
                 key={item.id}
                 item={item}
-                onSetStatus={setStatus}
+                onSetStatus={handleSetStatus}
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
-                onSetRating={setRating}
+                onSetRating={handleSetRating}
                 allTags={allTags}
                 dimDone={filters.tags.size === 0}
               />
@@ -155,10 +172,10 @@ export default function WatchLaterTab() {
             <WatchLaterTile
               key={item.id}
               item={item}
-              onSetStatus={setStatus}
+              onSetStatus={handleSetStatus}
               onRemove={removeItem}
               onToggleTag={toggleTag}
-              onSetRating={setRating}
+              onSetRating={handleSetRating}
               allTags={allTags}
               dimDone={filters.tags.size === 0}
             />

@@ -26,7 +26,9 @@ export default function GameTicket({ item, onSetStatus, onRemove, onToggleTag, o
         {item.coverUrl ? (
           <img src={item.coverUrl} alt="" />
         ) : (
-          <div className="media-card-cover-empty" />
+          <div className="media-card-cover-empty media-card-cover-fallback">
+            <span>{item.title}</span>
+          </div>
         )}
       </div>
 

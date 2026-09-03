@@ -24,7 +24,13 @@ export default function BookTicket({ item, onSetStatus, onRemove, onToggleTag, o
       <TagMenu tags={tags} allTags={allTags} onToggleTag={(tag) => onToggleTag(item.id, tag)} />
 
       <div className="media-card-cover">
-        {cover ? <img src={cover} alt="" /> : <div className="media-card-cover-empty" />}
+        {cover ? (
+          <img src={cover} alt="" />
+        ) : (
+          <div className="media-card-cover-empty media-card-cover-fallback">
+            <span>{item.title}</span>
+          </div>
+        )}
       </div>
 
       <div className="media-card-perforation" />
