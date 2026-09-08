@@ -5,7 +5,6 @@ import TicketGrid, { EmptyState } from './TicketGrid'
 import { useWatchlist } from '../hooks/useWatchlist'
 import { getGenreMaps, getDetails } from '../api/tmdb'
 import { RUNTIME_BUCKETS } from '../utils/format'
-import { scheduleAutoClear } from '../utils/completionTracking'
 
 const EMPTY_FILTERS = {
   genres: new Set(),
@@ -35,6 +34,7 @@ export default function WatchTab() {
   const [configError, setConfigError] = useState(null)
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [justCompletedIds, setJustCompletedIds] = useState(new Set())
+  const [pendingWasWatching, setPendingWasWatching] = useState(new Set())
   const checkedForNewSeasons = useRef(false)
 
   useEffect(() => {
@@ -95,10 +95,15 @@ export default function WatchTab() {
   // Marking something Watched removes it from the default view - but if it
   // just happened this session, keep it visible (dimmed) until the person
   // acts on the rating prompt, rather than yanking the card out from under them.
+  // If it was in "Currently Watching", keep it there too - don't let it jump
+  // down to the general reel until the rating is actually resolved.
   function handleSetStatus(id, status) {
     if (status === 'watched') {
+      const current = items.find((i) => i.id === id)
       setJustCompletedIds((prev) => new Set(prev).add(id))
-      scheduleAutoClear(setJustCompletedIds, id)
+      if (current?.status === 'watching') {
+        setPendingWasWatching((prev) => new Set(prev).add(id))
+      }
     }
     setStatus(id, status)
   }
@@ -109,7 +114,9 @@ export default function WatchTab() {
       const willComplete = !item.seasons[seasonIndex] && item.seasons.every((s, idx) => (idx === seasonIndex ? true : s))
       if (willComplete) {
         setJustCompletedIds((prev) => new Set(prev).add(id))
-        scheduleAutoClear(setJustCompletedIds, id)
+        if (item.status === 'watching') {
+          setPendingWasWatching((prev) => new Set(prev).add(id))
+        }
       }
     }
     toggleSeason(id, seasonIndex)
@@ -121,11 +128,21 @@ export default function WatchTab() {
       next.delete(id)
       return next
     })
+    setPendingWasWatching((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
     setRating(id, rating)
   }
 
   function handleSkipRating(id) {
     setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setPendingWasWatching((prev) => {
       const next = new Set(prev)
       next.delete(id)
       return next
@@ -191,8 +208,12 @@ export default function WatchTab() {
     return list
   }, [items, filters, justCompletedIds])
 
-  const watchingItems = visibleItems.filter((i) => i.status === 'watching')
-  const restItems = visibleItems.filter((i) => i.status !== 'watching')
+  const watchingItems = visibleItems.filter(
+    (i) => i.status === 'watching' || pendingWasWatching.has(i.id)
+  )
+  const restItems = visibleItems.filter(
+    (i) => i.status !== 'watching' && !pendingWasWatching.has(i.id)
+  )
 
   return (
     <>

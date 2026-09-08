@@ -5,7 +5,7 @@ import TagFilterGroup from './TagFilterGroup'
 import RatingFilterGroup from './RatingFilterGroup'
 import { useArticles } from '../hooks/useArticles'
 import { READ_STATUSES } from '../utils/format'
-import { scheduleAutoClear } from '../utils/completionTracking'
+import MobileFilterToggle from './MobileFilterToggle'
 
 const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), ratings: new Set(), sort: 'title' }
 
@@ -13,6 +13,7 @@ export default function ArticlesTab() {
   const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useArticles()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [justCompletedIds, setJustCompletedIds] = useState(new Set())
+  const [pendingWasInProgress, setPendingWasInProgress] = useState(new Set())
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
 
@@ -37,8 +38,11 @@ export default function ArticlesTab() {
   // acts on the rating prompt, rather than yanking the card out from under them.
   function handleSetStatus(id, status) {
     if (status === 'read') {
+      const current = items.find((i) => i.id === id)
       setJustCompletedIds((prev) => new Set(prev).add(id))
-      scheduleAutoClear(setJustCompletedIds, id)
+      if (current?.status === 'reading') {
+        setPendingWasInProgress((prev) => new Set(prev).add(id))
+      }
     }
     setStatus(id, status)
   }
@@ -49,11 +53,21 @@ export default function ArticlesTab() {
       next.delete(id)
       return next
     })
+    setPendingWasInProgress((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
     setRating(id, rating)
   }
 
   function handleSkipRating(id) {
     setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setPendingWasInProgress((prev) => {
       const next = new Set(prev)
       next.delete(id)
       return next
@@ -81,14 +95,18 @@ export default function ArticlesTab() {
     return list
   }, [items, filters, justCompletedIds])
 
-  const readingItems = visibleItems.filter((i) => i.status === 'reading')
-  const restItems = visibleItems.filter((i) => i.status !== 'reading')
+  const readingItems = visibleItems.filter(
+    (i) => i.status === 'reading' || pendingWasInProgress.has(i.id)
+  )
+  const restItems = visibleItems.filter(
+    (i) => i.status !== 'reading' && !pendingWasInProgress.has(i.id)
+  )
 
   return (
     <>
       <ArticlesHeader onAdd={addItem} existingIds={existingIds} />
 
-      <div className="filter-window">
+      <MobileFilterToggle>
         <div className="filter-group">
           <span className="filter-group-label">Status</span>
           <div className="chip-row">
@@ -135,7 +153,7 @@ export default function ArticlesTab() {
             Clear filters
           </button>
         )}
-      </div>
+      </MobileFilterToggle>
 
       {readingItems.length > 0 && (
         <>

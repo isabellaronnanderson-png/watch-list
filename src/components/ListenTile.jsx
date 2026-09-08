@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { coverUrl as openLibraryCoverUrl } from '../api/openLibrary'
 import { LISTEN_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
@@ -18,6 +19,7 @@ export default function ListenTile({
   dimDone = true,
   isPendingRating = false,
 }) {
+  const [expanded, setExpanded] = useState(false)
   const isAudiobook = item.kind === 'audiobook'
   const cover = isAudiobook
     ? item.coverUrl || (item.coverId ? openLibraryCoverUrl(item.coverId, 'M') : null)
@@ -25,7 +27,10 @@ export default function ListenTile({
   const tags = item.tags || []
 
   return (
-    <article id={item.id} className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}`}>
+    <article
+      id={item.id}
+      className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}
+    >
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}
@@ -51,43 +56,56 @@ export default function ListenTile({
 
       <div className="media-card-body">
         <span className="media-card-kind">{isAudiobook ? 'Audiobook' : 'Manual'}</span>
-        <h3 className="media-card-title">{item.title}</h3>
-        {isAudiobook ? (
-          <p className="media-card-sub">{item.author}</p>
-        ) : (
-          item.subtitle && <p className="media-card-sub">{item.subtitle}</p>
-        )}
-        {isAudiobook && item.genres?.length > 0 && (
-          <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
-        )}
-        {tags.length > 0 && (
-          <div className="media-card-tags">
-            {tags.map((t) => (
-              <span key={t} className="tag-chip">
-                {t === 'Favorite' ? '★ Favorite' : t}
-              </span>
-            ))}
-          </div>
-        )}
-        {!isPendingRating && (
-          <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
-        )}
-        <div className="media-card-barcode" />
-        <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
-        {isPendingRating ? (
-          <InlineRatingPrompt
-            rating={item.rating}
-            onSetRating={(r) => onSetRating(item.id, r)}
-            onSkip={() => onSkipRating(item.id)}
-          />
-        ) : (
-          <StatusStub
-            statuses={LISTEN_STATUSES}
-            status={item.status}
-            onSetStatus={(s) => onSetStatus(item.id, s)}
-            labels={LABELS}
-          />
-        )}
+        <div className="media-card-title-row">
+          <h3 className="media-card-title">{item.title}</h3>
+          <span className="mobile-status-pill">{LABELS[item.status] || item.status}</span>
+          <button
+            type="button"
+            className="mobile-expand-toggle"
+            onClick={() => setExpanded((v) => !v)}
+            aria-label={expanded ? 'Show less' : 'Show more'}
+          >
+            {expanded ? '▲' : '▼'}
+          </button>
+        </div>
+        <div className="media-card-detail">
+          {isAudiobook ? (
+            <p className="media-card-sub">{item.author}</p>
+          ) : (
+            item.subtitle && <p className="media-card-sub">{item.subtitle}</p>
+          )}
+          {isAudiobook && item.genres?.length > 0 && (
+            <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
+          )}
+          {tags.length > 0 && (
+            <div className="media-card-tags">
+              {tags.map((t) => (
+                <span key={t} className="tag-chip">
+                  {t === 'Favorite' ? '★ Favorite' : t}
+                </span>
+              ))}
+            </div>
+          )}
+          {!isPendingRating && (
+            <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
+          )}
+          <div className="media-card-barcode" />
+          <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
+          {isPendingRating ? (
+            <InlineRatingPrompt
+              rating={item.rating}
+              onSetRating={(r) => onSetRating(item.id, r)}
+              onSkip={() => onSkipRating(item.id)}
+            />
+          ) : (
+            <StatusStub
+              statuses={LISTEN_STATUSES}
+              status={item.status}
+              onSetStatus={(s) => onSetStatus(item.id, s)}
+              labels={LABELS}
+            />
+          )}
+        </div>
       </div>
     </article>
   )

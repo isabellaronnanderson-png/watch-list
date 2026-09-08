@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { GAME_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
@@ -18,10 +19,14 @@ export default function GameTicket({
   dimDone = true,
   isPendingRating = false,
 }) {
+  const [expanded, setExpanded] = useState(false)
   const tags = item.tags || []
 
   return (
-    <article id={item.id} className={`media-card${item.status === 'played' && dimDone ? ' is-done' : ''}`}>
+    <article
+      id={item.id}
+      className={`media-card${item.status === 'played' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}
+    >
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}
@@ -50,55 +55,68 @@ export default function GameTicket({
           <span className="media-card-kind">Game</span>
           {item.year && <span className="media-card-year">{item.year}</span>}
         </div>
-        <h3 className="media-card-title">{item.title}</h3>
-        {item.platforms?.length > 0 && (
-          <p className="media-card-sub">{item.platforms.slice(0, 3).join(' · ')}</p>
-        )}
-        {item.genres?.length > 0 && (
-          <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
-        )}
-        {tags.length > 0 && (
-          <div className="media-card-tags">
-            {tags.map((t) => (
-              <span key={t} className="tag-chip">
-                {t === 'Favorite' ? '★ Favorite' : t}
-              </span>
-            ))}
+        <div className="media-card-title-row">
+          <h3 className="media-card-title">{item.title}</h3>
+          <span className="mobile-status-pill">{LABELS[item.status] || item.status}</span>
+          <button
+            type="button"
+            className="mobile-expand-toggle"
+            onClick={() => setExpanded((v) => !v)}
+            aria-label={expanded ? 'Show less' : 'Show more'}
+          >
+            {expanded ? '▲' : '▼'}
+          </button>
+        </div>
+        <div className="media-card-detail">
+          {item.platforms?.length > 0 && (
+            <p className="media-card-sub">{item.platforms.slice(0, 3).join(' · ')}</p>
+          )}
+          {item.genres?.length > 0 && (
+            <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
+          )}
+          {tags.length > 0 && (
+            <div className="media-card-tags">
+              {tags.map((t) => (
+                <span key={t} className="tag-chip">
+                  {t === 'Favorite' ? '★ Favorite' : t}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="media-card-providers">
+            {item.modes?.length > 0 ? (
+              item.modes.map((m) => (
+                <span key={m} className="provider-stamp">
+                  {MODE_LABELS[m] || m}
+                </span>
+              ))
+            ) : (
+              <span className="media-card-providers-empty">Mode unknown</span>
+            )}
           </div>
-        )}
-        <div className="media-card-providers">
-          {item.modes?.length > 0 ? (
-            item.modes.map((m) => (
-              <span key={m} className="provider-stamp">
-                {MODE_LABELS[m] || m}
-              </span>
-            ))
+          <span className="media-card-runtime">
+            {item.playtimeHours ? `~${item.playtimeHours}H` : '— H'}
+          </span>
+          {!isPendingRating && (
+            <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
+          )}
+          <div className="media-card-barcode" />
+          <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
+          {isPendingRating ? (
+            <InlineRatingPrompt
+              rating={item.rating}
+              onSetRating={(r) => onSetRating(item.id, r)}
+              onSkip={() => onSkipRating(item.id)}
+            />
           ) : (
-            <span className="media-card-providers-empty">Mode unknown</span>
+            <StatusStub
+              statuses={GAME_STATUSES}
+              status={item.status}
+              onSetStatus={(s) => onSetStatus(item.id, s)}
+              labels={LABELS}
+            />
           )}
         </div>
-        <span className="media-card-runtime">
-          {item.playtimeHours ? `~${item.playtimeHours}H` : '— H'}
-        </span>
-        {!isPendingRating && (
-          <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
-        )}
-        <div className="media-card-barcode" />
-        <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
-        {isPendingRating ? (
-          <InlineRatingPrompt
-            rating={item.rating}
-            onSetRating={(r) => onSetRating(item.id, r)}
-            onSkip={() => onSkipRating(item.id)}
-          />
-        ) : (
-          <StatusStub
-            statuses={GAME_STATUSES}
-            status={item.status}
-            onSetStatus={(s) => onSetStatus(item.id, s)}
-            labels={LABELS}
-          />
-        )}
       </div>
     </article>
   )

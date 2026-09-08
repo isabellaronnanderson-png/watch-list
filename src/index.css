@@ -1453,6 +1453,46 @@ input:focus-visible,
   border-radius: 3px;
 }
 
+/* ---------- Mobile collapse/expand scaffolding (base rules, all sizes) ---------- */
+
+.media-card-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.media-card-title-row .media-card-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-status-pill {
+  display: none;
+}
+
+.mobile-expand-toggle {
+  display: none;
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  color: var(--text-muted);
+  font-size: 9px;
+  cursor: pointer;
+}
+
+/* On desktop this wrapper is invisible - its children flow exactly as if they
+   were direct children of .media-card-body, preserving the original layout. */
+.media-card-detail {
+  display: contents;
+}
+
+.mobile-filters-toggle {
+  display: none;
+}
+
 /* ---------- Mobile ---------- */
 
 @media (max-width: 640px) {
@@ -1479,18 +1519,63 @@ input:focus-visible,
     white-space: nowrap;
   }
 
+  .mobile-filters-toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--accent);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+
+  .filter-window {
+    display: none;
+  }
+
+  .filter-window.is-open-mobile {
+    display: flex;
+  }
+
   .media-grid-h,
   .media-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
 
+  .media-card.is-expanded {
+    grid-column: 1 / -1;
+  }
+
+  /* Collapsed tiles: cover on top, full width, like the vertical cards already are. */
+  .media-card-h {
+    flex-direction: column;
+  }
+
   .media-card-h .media-card-cover {
-    width: 70px;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .media-card-h .media-card-perforation {
+    display: none;
+  }
+
+  .media-card.is-expanded .media-card-perforation {
+    display: block;
+    border-top: 2px dashed var(--border);
+    border-left: none;
+    margin: 0 14px;
   }
 
   .media-card-body {
-    padding: 8px 8px 10px;
+    padding: 8px;
     gap: 3px;
   }
 
@@ -1498,31 +1583,62 @@ input:focus-visible,
     font-size: 13px;
   }
 
-  .media-card-sub,
   .media-card-kind,
-  .media-card-year,
-  .media-card-runtime {
+  .media-card-year {
     font-size: 9px;
   }
 
-  .media-card-barcode,
-  .media-card-ticket-no {
+  .mobile-status-pill {
+    display: inline-block;
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .media-card.is-expanded .mobile-status-pill {
     display: none;
+  }
+
+  .mobile-expand-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Collapsed: hide everything below the title/pill row. Expanded: reveal it,
+     now behaving as a normal block instead of the desktop's invisible wrapper. */
+  .media-card-detail {
+    display: none;
+  }
+
+  .media-card.is-expanded .media-card-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .media-card-sub,
+  .media-card-runtime {
+    font-size: 10px;
   }
 
   .provider-stamp,
   .tag-chip {
-    font-size: 7px;
-    padding: 1px 4px;
+    font-size: 8px;
+    padding: 1px 5px;
   }
 
   .stub-status-btn {
-    font-size: 8px;
-    padding: 4px 2px;
+    font-size: 9px;
+    padding: 5px 3px;
   }
 
   .star-btn {
-    font-size: 12px;
+    font-size: 14px;
   }
 
   .filter-window {

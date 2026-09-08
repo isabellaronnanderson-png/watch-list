@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { READ_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
@@ -17,10 +18,11 @@ export default function ArticleTile({
   dimDone = true,
   isPendingRating = false,
 }) {
+  const [expanded, setExpanded] = useState(false)
   const tags = item.tags || []
 
   return (
-    <article className={`media-card${item.status === 'read' && dimDone ? ' is-done' : ''}`}>
+    <article className={`media-card${item.status === 'read' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}
@@ -46,36 +48,49 @@ export default function ArticleTile({
 
       <div className="media-card-body">
         <span className="media-card-kind">Article</span>
-        <h3 className="media-card-title">{item.title}</h3>
-        {item.publisher && <p className="media-card-sub">{item.publisher}</p>}
-        {tags.length > 0 && (
-          <div className="media-card-tags">
-            {tags.map((t) => (
-              <span key={t} className="tag-chip">
-                {t === 'Favorite' ? '★ Favorite' : t}
-              </span>
-            ))}
-          </div>
-        )}
-        {!isPendingRating && (
-          <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
-        )}
-        <div className="media-card-barcode" />
-        <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
-        {isPendingRating ? (
-          <InlineRatingPrompt
-            rating={item.rating}
-            onSetRating={(r) => onSetRating(item.id, r)}
-            onSkip={() => onSkipRating(item.id)}
-          />
-        ) : (
-          <StatusStub
-            statuses={READ_STATUSES}
-            status={item.status}
-            onSetStatus={(s) => onSetStatus(item.id, s)}
-            labels={LABELS}
-          />
-        )}
+        <div className="media-card-title-row">
+          <h3 className="media-card-title">{item.title}</h3>
+          <span className="mobile-status-pill">{LABELS[item.status] || item.status}</span>
+          <button
+            type="button"
+            className="mobile-expand-toggle"
+            onClick={() => setExpanded((v) => !v)}
+            aria-label={expanded ? 'Show less' : 'Show more'}
+          >
+            {expanded ? '▲' : '▼'}
+          </button>
+        </div>
+        <div className="media-card-detail">
+          {item.publisher && <p className="media-card-sub">{item.publisher}</p>}
+          {tags.length > 0 && (
+            <div className="media-card-tags">
+              {tags.map((t) => (
+                <span key={t} className="tag-chip">
+                  {t === 'Favorite' ? '★ Favorite' : t}
+                </span>
+              ))}
+            </div>
+          )}
+          {!isPendingRating && (
+            <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
+          )}
+          <div className="media-card-barcode" />
+          <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
+          {isPendingRating ? (
+            <InlineRatingPrompt
+              rating={item.rating}
+              onSetRating={(r) => onSetRating(item.id, r)}
+              onSkip={() => onSkipRating(item.id)}
+            />
+          ) : (
+            <StatusStub
+              statuses={READ_STATUSES}
+              status={item.status}
+              onSetStatus={(s) => onSetStatus(item.id, s)}
+              labels={LABELS}
+            />
+          )}
+        </div>
       </div>
     </article>
   )

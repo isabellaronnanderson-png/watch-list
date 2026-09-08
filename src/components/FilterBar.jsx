@@ -2,6 +2,7 @@ import { RUNTIME_BUCKETS, MEDIA_TYPES, WATCH_STATUSES } from '../utils/format'
 import { ALL_PROVIDER_FILTER_OPTIONS } from '../utils/providers'
 import TagFilterGroup from './TagFilterGroup'
 import RatingFilterGroup from './RatingFilterGroup'
+import MobileFilterToggle from './MobileFilterToggle'
 
 export default function FilterBar({
   allGenres,
@@ -21,7 +22,7 @@ export default function FilterBar({
   hasActiveFilters,
 }) {
   return (
-    <div className="filter-window">
+    <MobileFilterToggle>
       <div className="filter-group">
         <span className="filter-group-label">Status</span>
         <div className="chip-row">
@@ -133,6 +134,6 @@ export default function FilterBar({
           Clear filters
         </button>
       )}
-    </div>
+    </MobileFilterToggle>
   )
 }

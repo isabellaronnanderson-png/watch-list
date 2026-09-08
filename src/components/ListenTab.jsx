@@ -5,7 +5,7 @@ import TagFilterGroup from './TagFilterGroup'
 import RatingFilterGroup from './RatingFilterGroup'
 import { useListenlist } from '../hooks/useListenlist'
 import { LISTEN_STATUSES } from '../utils/format'
-import { scheduleAutoClear } from '../utils/completionTracking'
+import MobileFilterToggle from './MobileFilterToggle'
 
 const EMPTY_FILTERS = {
   genres: new Set(),
@@ -19,6 +19,7 @@ export default function ListenTab() {
   const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useListenlist()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [justCompletedIds, setJustCompletedIds] = useState(new Set())
+  const [pendingWasInProgress, setPendingWasInProgress] = useState(new Set())
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
 
@@ -49,8 +50,11 @@ export default function ListenTab() {
   // acts on the rating prompt, rather than yanking the card out from under them.
   function handleSetStatus(id, status) {
     if (status === 'listened') {
+      const current = items.find((i) => i.id === id)
       setJustCompletedIds((prev) => new Set(prev).add(id))
-      scheduleAutoClear(setJustCompletedIds, id)
+      if (current?.status === 'listening') {
+        setPendingWasInProgress((prev) => new Set(prev).add(id))
+      }
     }
     setStatus(id, status)
   }
@@ -61,11 +65,21 @@ export default function ListenTab() {
       next.delete(id)
       return next
     })
+    setPendingWasInProgress((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
     setRating(id, rating)
   }
 
   function handleSkipRating(id) {
     setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setPendingWasInProgress((prev) => {
       const next = new Set(prev)
       next.delete(id)
       return next
@@ -103,14 +117,18 @@ export default function ListenTab() {
     return list
   }, [items, filters, justCompletedIds])
 
-  const listeningItems = visibleItems.filter((i) => i.status === 'listening')
-  const restItems = visibleItems.filter((i) => i.status !== 'listening')
+  const listeningItems = visibleItems.filter(
+    (i) => i.status === 'listening' || pendingWasInProgress.has(i.id)
+  )
+  const restItems = visibleItems.filter(
+    (i) => i.status !== 'listening' && !pendingWasInProgress.has(i.id)
+  )
 
   return (
     <>
       <ListenHeader onAdd={addItem} existingIds={existingIds} />
 
-      <div className="filter-window">
+      <MobileFilterToggle>
         <div className="filter-group">
           <span className="filter-group-label">Status</span>
           <div className="chip-row">
@@ -176,7 +194,7 @@ export default function ListenTab() {
             Clear filters
           </button>
         )}
-      </div>
+      </MobileFilterToggle>
 
       {listeningItems.length > 0 && (
         <>

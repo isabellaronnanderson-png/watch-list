@@ -5,7 +5,7 @@ import TagFilterGroup from './TagFilterGroup'
 import RatingFilterGroup from './RatingFilterGroup'
 import { useWatchLater } from '../hooks/useWatchLater'
 import { WATCH_STATUSES } from '../utils/format'
-import { scheduleAutoClear } from '../utils/completionTracking'
+import MobileFilterToggle from './MobileFilterToggle'
 
 const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), ratings: new Set(), sort: 'title' }
 
@@ -13,6 +13,7 @@ export default function WatchLaterTab() {
   const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useWatchLater()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const [justCompletedIds, setJustCompletedIds] = useState(new Set())
+  const [pendingWasInProgress, setPendingWasInProgress] = useState(new Set())
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
 
@@ -52,8 +53,11 @@ export default function WatchLaterTab() {
 
   function handleSetStatus(id, status) {
     if (status === 'watched') {
+      const current = items.find((i) => i.id === id)
       setJustCompletedIds((prev) => new Set(prev).add(id))
-      scheduleAutoClear(setJustCompletedIds, id)
+      if (current?.status === 'watching') {
+        setPendingWasInProgress((prev) => new Set(prev).add(id))
+      }
     }
     setStatus(id, status)
   }
@@ -64,11 +68,21 @@ export default function WatchLaterTab() {
       next.delete(id)
       return next
     })
+    setPendingWasInProgress((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
     setRating(id, rating)
   }
 
   function handleSkipRating(id) {
     setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
+    setPendingWasInProgress((prev) => {
       const next = new Set(prev)
       next.delete(id)
       return next
@@ -96,14 +110,18 @@ export default function WatchLaterTab() {
     return list
   }, [items, filters, justCompletedIds])
 
-  const watchingItems = visibleItems.filter((i) => i.status === 'watching')
-  const restItems = visibleItems.filter((i) => i.status !== 'watching')
+  const watchingItems = visibleItems.filter(
+    (i) => i.status === 'watching' || pendingWasInProgress.has(i.id)
+  )
+  const restItems = visibleItems.filter(
+    (i) => i.status !== 'watching' && !pendingWasInProgress.has(i.id)
+  )
 
   return (
     <>
       <WatchLaterHeader onAdd={addItem} existingIds={existingIds} />
 
-      <div className="filter-window">
+      <MobileFilterToggle>
         <div className="filter-group">
           <span className="filter-group-label">Status</span>
           <div className="chip-row">
@@ -147,7 +165,7 @@ export default function WatchLaterTab() {
             Clear filters
           </button>
         )}
-      </div>
+      </MobileFilterToggle>
 
       {watchingItems.length > 0 && (
         <>
