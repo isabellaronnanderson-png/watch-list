@@ -34,6 +34,11 @@
   --tab-accent: #8b2fc9;
   --tab-accent-rgb: 139, 47, 201;
 }
+
+.tab-albums {
+  --tab-accent: #e8842d;
+  --tab-accent-rgb: 232, 132, 45;
+}
 .tab-watchlater {
   --tab-accent: #e5342a;
   --tab-accent-rgb: 229, 52, 42;
@@ -942,6 +947,10 @@ input:focus-visible,
   aspect-ratio: 16 / 9;
 }
 
+.media-card-cover-square {
+  aspect-ratio: 1 / 1;
+}
+
 .media-card-cover-wide img {
   object-fit: cover;
 }
@@ -1561,6 +1570,10 @@ input:focus-visible,
     width: 100%;
     aspect-ratio: 2 / 3;
     border-radius: 8px 8px 0 0;
+  }
+
+  .media-card-h .media-card-cover-square {
+    aspect-ratio: 1 / 1;
   }
 
   .media-card-h .media-card-perforation {

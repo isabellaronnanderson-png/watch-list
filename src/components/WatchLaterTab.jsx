@@ -2,18 +2,15 @@ import { useMemo, useState } from 'react'
 import WatchLaterHeader from './WatchLaterHeader'
 import WatchLaterTile from './WatchLaterTile'
 import TagFilterGroup from './TagFilterGroup'
-import RatingFilterGroup from './RatingFilterGroup'
 import { useWatchLater } from '../hooks/useWatchLater'
 import { WATCH_STATUSES } from '../utils/format'
 import MobileFilterToggle from './MobileFilterToggle'
 
-const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), ratings: new Set(), sort: 'title' }
+const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), sort: 'title' }
 
 export default function WatchLaterTab() {
-  const { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag } = useWatchLater()
+  const { items, addItem, removeItem, setStatus, toggleTag, renameTag, deleteTag } = useWatchLater()
   const [filters, setFilters] = useState(EMPTY_FILTERS)
-  const [justCompletedIds, setJustCompletedIds] = useState(new Set())
-  const [pendingWasInProgress, setPendingWasInProgress] = useState(new Set())
 
   const existingIds = useMemo(() => new Set(items.map((i) => i.id)), [items])
 
@@ -42,65 +39,16 @@ export default function WatchLaterTab() {
     })
   }
 
-  function toggleRatingFilter(r) {
-    setFilters((prev) => {
-      const next = new Set(prev.ratings)
-      if (next.has(r)) next.delete(r)
-      else next.add(r)
-      return { ...prev, ratings: next }
-    })
-  }
-
-  function handleSetStatus(id, status) {
-    if (status === 'watched') {
-      const current = items.find((i) => i.id === id)
-      setJustCompletedIds((prev) => new Set(prev).add(id))
-      if (current?.status === 'watching') {
-        setPendingWasInProgress((prev) => new Set(prev).add(id))
-      }
-    }
-    setStatus(id, status)
-  }
-
-  function handleSetRating(id, rating) {
-    setJustCompletedIds((prev) => {
-      const next = new Set(prev)
-      next.delete(id)
-      return next
-    })
-    setPendingWasInProgress((prev) => {
-      const next = new Set(prev)
-      next.delete(id)
-      return next
-    })
-    setRating(id, rating)
-  }
-
-  function handleSkipRating(id) {
-    setJustCompletedIds((prev) => {
-      const next = new Set(prev)
-      next.delete(id)
-      return next
-    })
-    setPendingWasInProgress((prev) => {
-      const next = new Set(prev)
-      next.delete(id)
-      return next
-    })
-  }
-
-  const hasActiveFilters =
-    filters.statuses.size > 0 || filters.tags.size > 0 || filters.ratings.size > 0
+  const hasActiveFilters = filters.statuses.size > 0 || filters.tags.size > 0
 
   const visibleItems = useMemo(() => {
     let list = items.filter((item) => {
       if (filters.statuses.size > 0) {
         if (!filters.statuses.has(item.status)) return false
-      } else if (item.status === 'watched' && filters.tags.size === 0 && !justCompletedIds.has(item.id)) {
+      } else if (item.status === 'watched' && filters.tags.size === 0) {
         return false
       }
       if (filters.tags.size > 0 && !item.tags?.some((t) => filters.tags.has(t))) return false
-      if (filters.ratings.size > 0 && !filters.ratings.has(item.rating)) return false
       return true
     })
     list = [...list].sort((a, b) => {
@@ -108,14 +56,10 @@ export default function WatchLaterTab() {
       return b.addedAt - a.addedAt
     })
     return list
-  }, [items, filters, justCompletedIds])
+  }, [items, filters])
 
-  const watchingItems = visibleItems.filter(
-    (i) => i.status === 'watching' || pendingWasInProgress.has(i.id)
-  )
-  const restItems = visibleItems.filter(
-    (i) => i.status !== 'watching' && !pendingWasInProgress.has(i.id)
-  )
+  const watchingItems = visibleItems.filter((i) => i.status === 'watching')
+  const restItems = visibleItems.filter((i) => i.status !== 'watching')
 
   return (
     <>
@@ -146,8 +90,6 @@ export default function WatchLaterTab() {
           onDeleteTag={deleteTag}
         />
 
-        <RatingFilterGroup selectedRatings={filters.ratings} onToggleRating={toggleRatingFilter} />
-
         <div className="filter-group">
           <span className="filter-group-label">Sort</span>
           <select
@@ -177,12 +119,9 @@ export default function WatchLaterTab() {
               <WatchLaterTile
                 key={item.id}
                 item={item}
-                onSetStatus={handleSetStatus}
+                onSetStatus={setStatus}
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
-                onSetRating={handleSetRating}
-                onSkipRating={handleSkipRating}
-                isPendingRating={justCompletedIds.has(item.id)}
                 allTags={allTags}
                 dimDone={filters.tags.size === 0}
               />
@@ -202,12 +141,9 @@ export default function WatchLaterTab() {
             <WatchLaterTile
               key={item.id}
               item={item}
-              onSetStatus={handleSetStatus}
+              onSetStatus={setStatus}
               onRemove={removeItem}
               onToggleTag={toggleTag}
-              onSetRating={handleSetRating}
-                onSkipRating={handleSkipRating}
-                isPendingRating={justCompletedIds.has(item.id)}
               allTags={allTags}
               dimDone={filters.tags.size === 0}
             />

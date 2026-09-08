@@ -2,22 +2,10 @@ import { useState } from 'react'
 import { READ_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
-import StarRating from './StarRating'
-import InlineRatingPrompt from './InlineRatingPrompt'
 
 const LABELS = { want: 'Want', reading: 'Reading', read: 'Read' }
 
-export default function ArticleTile({
-  item,
-  onSetStatus,
-  onRemove,
-  onToggleTag,
-  onSetRating,
-  onSkipRating,
-  allTags,
-  dimDone = true,
-  isPendingRating = false,
-}) {
+export default function ArticleTile({ item, onSetStatus, onRemove, onToggleTag, allTags, dimDone = true }) {
   const [expanded, setExpanded] = useState(false)
   const tags = item.tags || []
 
@@ -71,25 +59,14 @@ export default function ArticleTile({
               ))}
             </div>
           )}
-          {!isPendingRating && (
-            <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
-          )}
           <div className="media-card-barcode" />
           <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
-          {isPendingRating ? (
-            <InlineRatingPrompt
-              rating={item.rating}
-              onSetRating={(r) => onSetRating(item.id, r)}
-              onSkip={() => onSkipRating(item.id)}
-            />
-          ) : (
-            <StatusStub
-              statuses={READ_STATUSES}
-              status={item.status}
-              onSetStatus={(s) => onSetStatus(item.id, s)}
-              labels={LABELS}
-            />
-          )}
+          <StatusStub
+            statuses={READ_STATUSES}
+            status={item.status}
+            onSetStatus={(s) => onSetStatus(item.id, s)}
+            labels={LABELS}
+          />
         </div>
       </div>
     </article>

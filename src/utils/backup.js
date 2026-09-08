@@ -2,6 +2,7 @@ const STORAGE_KEYS = [
   'marquee-watchlist:items',
   'marquee-watchlist:books',
   'marquee-watchlist:listen',
+  'marquee-watchlist:albums',
   'marquee-watchlist:games',
   'marquee-watchlist:youtube',
   'marquee-watchlist:articles',

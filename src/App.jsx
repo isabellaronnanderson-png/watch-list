@@ -6,6 +6,7 @@ import TabNav from './components/TabNav'
 import WatchTab from './components/WatchTab'
 import ReadTab from './components/ReadTab'
 import ListenTab from './components/ListenTab'
+import AlbumsTab from './components/AlbumsTab'
 import GamesTab from './components/GamesTab'
 import WatchLaterTab from './components/WatchLaterTab'
 import ArticlesTab from './components/ArticlesTab'
@@ -20,6 +21,7 @@ function AppShell() {
       {tab === 'watch' && <WatchTab />}
       {tab === 'read' && <ReadTab />}
       {tab === 'listen' && <ListenTab />}
+      {tab === 'albums' && <AlbumsTab />}
       {tab === 'games' && <GamesTab />}
       {tab === 'watchlater' && <WatchLaterTab />}
       {tab === 'articles' && <ArticlesTab />}

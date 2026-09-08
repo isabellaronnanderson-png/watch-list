@@ -3,6 +3,7 @@ const TABS = [
   { id: 'read', label: 'Read', accent: '242, 196, 0' },
   { id: 'articles', label: 'Articles', accent: '63, 174, 73' },
   { id: 'listen', label: 'Listen', accent: '78, 195, 224' },
+  { id: 'albums', label: 'Albums', accent: '232, 132, 45' },
   { id: 'games', label: 'Play', accent: '139, 47, 201' },
   { id: 'watchlater', label: 'YouTube', accent: '229, 52, 42' },
 ]
