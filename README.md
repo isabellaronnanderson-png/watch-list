@@ -1,145 +1,194 @@
-# A media tracker: Watch, Read, Listen, YouTube, Games
+# A Day Out
 
-A clean, white, monochrome media tracker across five tabs, each opening with an original
-grayscale "wall of spines" banner illustration (built in SVG, not a photo) with the tab
-name centered on top. Cards are styled like modern movie tickets — full uncropped
-cover art, a dashed perforation line, a barcode graphic, and a ticket number — used
-consistently across every tab.
+A guide to the perfect day out — save places, tag them by when they fit into
+a day, and generate a plan that keeps things close together, inside budget,
+and ahead of anything closing soon.
 
-- **Watch**: TMDB search, genre/runtime/type/streaming-service filters, status per title.
-- **Read**: Google Books search (English-preferred titles, clean categories), genre filter.
-- **Listen**: audiobooks via Google Books, on the same ticket design as everything else;
-  anything without a good API (podcast episodes, one-offs) gets added through a manual
-  form instead.
-- **YouTube**: paste any link and it pulls the title/channel/thumbnail via YouTube's free
-  oEmbed endpoint (no API key).
-- **Games**: RAWG search, with filters for console/platform, genre, length (estimated
-  playtime), and singleplayer/multiplayer.
+Built with React + Vite, deployed on Vercel. Places are saved to
+**browser local storage** — this app is single-device by design (see
+*Upgrading persistence* below if you want it to sync across devices later).
 
-All five tabs share the same Want → In Progress → Done status tracking, with an "in
-progress" section surfaced above the rest of the list.
+## Features
 
-## Setup
+- **Save places** to a personal collection, each tagged as breakfast,
+  daytime activity, evening activity, dinner, or drinks, with a city,
+  approximate cost, and notes.
+- **Google Places search** when adding a place, so you get a real address and
+  coordinates without typing them by hand (optional — you can also add a
+  place manually).
+- **Plan generator** — pick a city and day or evening, and it suggests a set
+  of stops (day = breakfast + activity + optional drink after; evening =
+  drinks + dinner + activity), favoring combinations that sit close together.
+- **Budget bracket** — cap the plan's total estimated spend.
+- **Closing soon** — give an exhibition an end date and it's flagged and
+  prioritized in plans as the date approaches (within 3 weeks).
+- **Favorites & "try new"** — mark places you loved, then generate a plan
+  biased toward favorites, or toward things you haven't been to yet.
 
-### Cloud sync (Supabase)
+## Local development
 
-Your lists live in `localStorage` by default, which is wiped if a browser's
-cache/site data is ever cleared. To make them survive that, this app can sync
-to a free Supabase project instead.
+```bash
+npm install
+```
 
-1. Create a free project at [supabase.com](https://supabase.com) (no card required).
-2. In the SQL Editor, run:
-   ```sql
-   create table if not exists lists (
-     user_id uuid references auth.users not null,
-     list_key text not null,
-     items jsonb not null default '[]'::jsonb,
-     updated_at timestamptz not null default now(),
-     primary key (user_id, list_key)
-   );
+You have two options for running it locally:
 
-   alter table lists enable row level security;
+**Without a Google API key** — place search will silently skip results and
+you can still add places manually (name, city, address typed by hand; no
+coordinates, so proximity scoring is neutral instead of distance-based):
 
-   create policy "Users can view their own lists"
-     on lists for select
-     using (auth.uid() = user_id);
+```bash
+npm run dev
+```
 
-   create policy "Users can insert their own lists"
-     on lists for insert
-     with check (auth.uid() = user_id);
+**With place search working** — you need the Vercel CLI, since `/api/places`
+is a serverless function:
 
-   create policy "Users can update their own lists"
-     on lists for update
-     using (auth.uid() = user_id);
-   ```
-3. In Project Settings → API, copy the **Project URL** and the **publishable**
-   (formerly "anon") key — the publishable key is safe to use in a browser app.
-4. Add both to `.env` (see below) and to your deploy host's environment variables.
+```bash
+npm i -g vercel
+cp .env.example .env   # then fill in GOOGLE_PLACES_API_KEY
+vercel dev
+```
 
-Without these two variables set, the app works exactly as before (local-only,
-no login screen). With them set, a simple email/password login gates the app,
-and every tab's data syncs to that account.
+## Setting up Google Places API
 
-Optional: in Supabase's Authentication settings, you can turn off "Confirm
-email" if you'd rather skip the email-verification step for a personal project.
+1. Create a project in the [Google Cloud Console](https://console.cloud.google.com/).
+2. Enable **Places API (New)**.
+3. Create an API key (Credentials → Create Credentials → API key).
+4. Since the key is only ever called from the serverless function
+   (`api/places.js`), never from the browser, you can restrict it to your
+   server's IPs or leave it unrestricted for a personal project — just don't
+   put it in any client-side code or `VITE_`-prefixed env var.
+5. Enable billing on the project. As of 2026 Google gives each Places API SKU
+   its own free monthly allowance (10,000 calls/month on the Essentials-tier
+   search this app uses), so a personal project will very likely stay free —
+   but Google still requires billing to be enabled to unlock the free tier.
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Copy the env file and add your keys:
-   ```bash
-   cp .env.example .env
-   ```
-   Open `.env` and set:
-   - `VITE_TMDB_API_KEY` — your TMDB v3 API key (from https://www.themoviedb.org/settings/api) — only used by the Watch tab
-   - `VITE_TMDB_REGION` — two-letter region code for streaming availability, e.g. `GB`, `SE`, `US`
-   - `VITE_RAWG_API_KEY` — a free key from https://rawg.io/apidocs — only used by the Games tab
+## The header
 
-   Read, Listen, and YouTube need no API key at all.
+The header is 4 full-bleed color fields, side by side. Click any field or
+drag a photo onto it to fill that slot — it replaces the color with your
+photo. Click the × that appears on hover to clear it back to the default
+color. Photos are stored in the browser's IndexedDB (same approach as place
+photos — see below) and persist across visits, so you can change the header
+whenever you like without touching any code. Nothing here needs a build or
+a redeploy; it's editable live in the running app.
 
-3. Run it locally:
-   ```bash
-   npm run dev
-   ```
+## Opening hours, editing, and photos
 
-4. Build for production:
-   ```bash
-   npm run build
-   ```
-   This outputs static files to `dist/`, which you can deploy to Netlify, Vercel, GitHub
-   Pages, Cloudflare Pages, or any static host. Set the two env vars above as build-time
-   environment variables in whatever host you use (they get baked into the build).
+- **Opening hours** — when you add a place via the Google Places search, its
+  hours come along automatically and the plan generator uses them: a place
+  is excluded from a suggested plan only when its hours clearly show it's
+  closed at that slot's typical time (breakfast ~9am, day activity ~2pm,
+  drinks ~6pm, dinner ~8pm, night activity ~10pm), based on today's day of
+  week. Places without hours data (added manually) are never penalized —
+  missing data is treated as "unknown," not "closed." Cards also show a
+  quick "open now / closed now" hint when hours are available.
+- **Editing** — every card has an "edit" button that reopens the same form
+  pre-filled, so you can retag a place, fix a typo, or add photos without
+  starting over.
+- **Photos** — each place can have its own small gallery, added from the
+  form. Photos are stored in the browser's IndexedDB (not localStorage,
+  which is too small for real images) and resized/compressed client-side
+  before saving. Click a thumbnail on a card to view it full-size.
 
-## How it works
+## Notes on place search accuracy
 
-- **Tabs** (`src/App.jsx`, `src/components/TabNav.jsx`): a simple state switch between
-  three independent tab components — `WatchTab.jsx`, `ReadTab.jsx`, `ListenTab.jsx`. Each
-  tab has its own search header, its own storage key, and its own filters.
-- **Watch** (`WatchTab.jsx`, `Header.jsx`, `FilterBar.jsx`, `TicketCard.jsx`): searches
-  TMDB, snapshots runtime + streaming providers on add, filters by genre/runtime/type/
-  provider. TV shows track watched status per season — the season dots fill in gold as
-  you check them off, and the whole ticket dims once every season is watched.
-- **Read** (`ReadTab.jsx`, `ReadHeader.jsx`, `BookTicket.jsx`): searches Open Library
-  (`src/api/openLibrary.js`), a free/keyless book database. Filter by genre and read
-  status.
-- **Listen** (`ListenTab.jsx`, `ListenHeader.jsx`, `ListenTile.jsx`): audiobooks are
-  searched via the same Open Library API and rendered as square cover tiles. Anything
-  without a good API — podcast episodes, one-off tracks — gets added through a small
-  manual form (title, show/artist, notes) instead.
-- **Storage** (`src/hooks/useWatchlist.js`, `useReadlist.js`, `useListenlist.js`): each
-  tab's list lives in its own `localStorage` key, scoped to the browser you're using.
-  No backend, no login.
-- **Streaming providers** (`src/utils/providers.js`): TMDB returns many near-duplicate
-  provider names (e.g. "Netflix" vs "Netflix Standard with Ads"). This file collapses
-  them into a fixed, curated set of chips — Netflix, Disney+, HBO Max, Apple TV,
-  Crunchyroll, BBC iPlayer, NOW, ITVX, Mubi, Channel 4, plus a "Rent / Buy" catch-all —
-  shown even when nothing in your list currently uses them.
-- **Styling** (`src/index.css`): plain CSS with a small set of custom properties at the
-  top (`--ink`, `--paper`, `--marquee-red`, `--ticket-gold`, `--reel-teal`) — no CSS
-  framework, so it's easy to reskin.
+Google's Text Search API infers location from the requesting server's IP
+address when no explicit bias is given — since `api/places.js` runs on
+Vercel's US infrastructure, searches would otherwise skew American
+regardless of what city you type. The function now includes a small
+city → coordinates lookup and passes an explicit `locationBias` circle
+(40km radius) around the typed city to Google, so results stay local.
 
-## A note on the API keys
+This lookup covers common cities but isn't exhaustive — if you search in a
+city that isn't in `CITY_COORDS` (in `api/places.js`), it'll fall back to
+the old text-based "in {city}" phrasing only, which can occasionally drift.
+Add more cities to that list as you need them; each entry is just
+`cityname: [latitude, longitude]`.
 
-This is a client-side-only app, which means your TMDB key ends up visible in the built
-JavaScript bundle (anyone who opens dev tools on your deployed site could read it). TMDB's
-free tier is rate-limited per key rather than tied to billing, so for a personal project
-this is a common and low-risk tradeoff. Open Library requires no key at all, so the Read
-and Listen tabs don't have this consideration. If you ever want to hide the TMDB key, the
-fix is to add a tiny serverless function that proxies requests to TMDB so the key never
-reaches the browser — happy to help you add that later if you want it.
+## Deploying
 
-Note on Goodreads: their public API stopped issuing new developer keys in December 2020
-and hasn't reopened since, which is why Read/Listen use Open Library instead.
+1. Push this repo to GitHub.
+2. Import it into [Vercel](https://vercel.com/new). It auto-detects Vite and
+   the `api/` folder as serverless functions — no config needed.
+3. In the Vercel project settings, add environment variables:
+   `GOOGLE_PLACES_API_KEY` = your key, plus `VITE_SUPABASE_URL` and
+   `VITE_SUPABASE_ANON_KEY` (see "Cloud storage, login, and backup" below —
+   required for login/sync to work on the deployed site).
+4. Deploy, then go back to Supabase's Auth settings and set the Site URL to
+   your new Vercel URL (see below) so confirmation emails link back correctly.
 
-## Extending it
+## Cloud storage, login, and backup
 
-Some natural next steps, roughly in order of effort:
-- Add a "notes" field per ticket (why you added it, who recommended it).
-- Add trailer links via TMDB's `/movie/{id}/videos` endpoint.
-- Add a YouTube "long videos" list — would need a YouTube Data API v3 key (free tier,
-  quota-limited) via Google Cloud Console.
-- Swap `localStorage` for a small backend (e.g. Supabase) if you want it to sync across
-  devices later — the three hooks in `src/hooks/` are the only files that would need to
-  change.
+The app is now gated behind email/password login (Supabase Auth), and your
+places sync to a Supabase table so they follow you across devices —
+localStorage stays as a fast local cache, but the cloud is the source of
+truth once you're signed in.
 
+**One-time setup, before this works:**
+
+1. **Run the schema.** In your Supabase project's SQL Editor, run the
+   contents of `supabase/schema.sql` in this repo. It creates a
+   `day_out_places` table (named specifically for this app, since you're
+   reusing a Supabase project shared with other projects) with row-level
+   security so each account only ever sees its own rows.
+2. **Set the Site URL.** In Supabase → Authentication → URL Configuration,
+   set the Site URL to your actual deployed URL (e.g.
+   `https://your-app.vercel.app`) once you know it. This is what the
+   confirmation-email link points back to — if it's left as `localhost`,
+   the link in the confirmation email won't return to your live site.
+3. **Add environment variables.** Locally, a `.env` file with your
+   credentials is already included (see `.env.example` for the format).
+   In Vercel's project settings, add the same two variables:
+   `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`. The anon/publishable
+   key is safe to expose client-side — it's designed for this, and access
+   control happens via the row-level security policies in the schema, not
+   by keeping this key secret.
+
+**How sign-up works:** creating an account shows a dedicated "check your
+email" screen rather than logging you straight in — Supabase requires
+clicking the confirmation link first (unless you've turned that off in
+your project's Auth settings), then you come back and sign in normally.
+
+**First login on a device that already had local data:** anything sitting
+in localStorage that isn't in the cloud yet gets pushed up automatically,
+rather than overwritten — see `syncOnLogin` in `src/lib/cloudSync.js` if
+you want the exact logic.
+
+**Backup / restore:** the "Backup" button in the header can export all your
+places as a JSON file, or restore from a previously exported one (this
+replaces your current data, with a confirmation prompt first, and re-syncs
+the restored set to the cloud). Note that this backs up place *data*
+(names, notes, tags, etc.) — not the header photos or per-place photo
+galleries, since those are larger binary images stored in IndexedDB rather
+than the lightweight JSON this export is meant for.
+
+## Project structure
+
+```
+src/
+  lib/
+    storage.js        localStorage cache for places
+    cloudSync.js       Supabase sync (mapping, fetch/upsert/delete, first-login merge)
+    supabaseClient.js  Supabase client setup
+    geo.js             haversine distance helper
+    planGenerator.js   the day-plan suggestion algorithm
+    placesApi.js        client for /api/places
+    categories.js       category labels + stamp colors
+  components/
+    AuthScreen.jsx        sign in / sign up
+    CheckEmailScreen.jsx  post-signup confirmation screen
+    BackupMenu.jsx         download/restore JSON backup
+    AccountBadge.jsx       avatar + sign out
+    PlaceCard.jsx        the "ticket stub" place display
+    PlaceForm.jsx         add-place modal with Places search
+    CategoryStamp.jsx     small category badge
+  pages/
+    SavedPlacesTab.jsx
+    PlanTab.jsx
+supabase/
+  schema.sql          run this in the Supabase SQL Editor once
+api/
+  places.js            serverless proxy to Google Places API (New)
+```
