@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { burstConfetti } from '../utils/confetti'
-import { showRatingPrompt } from '../utils/ratingPromptStore'
 
-export default function TvStatusControl({ status, seasons, onSetStatus, onToggleSeason, rating, onSetRating }) {
+export default function TvStatusControl({ status, seasons, onSetStatus, onToggleSeason }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
@@ -53,10 +52,7 @@ export default function TvStatusControl({ status, seasons, onSetStatus, onToggle
                   const willComplete = !watched && seasons.every((s, idx) => (idx === i ? true : s))
                   if (willComplete) {
                     const rect = e.target.getBoundingClientRect()
-                    const x = rect.left + rect.width / 2
-                    const y = rect.top + rect.height / 2
-                    burstConfetti(x, y)
-                    if (onSetRating) showRatingPrompt({ x, y, rating, onSetRating })
+                    burstConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2)
                   }
                   onToggleSeason(i)
                 }}

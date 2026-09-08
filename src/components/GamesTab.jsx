@@ -5,6 +5,7 @@ import TagFilterGroup from './TagFilterGroup'
 import RatingFilterGroup from './RatingFilterGroup'
 import { useGameslist } from '../hooks/useGameslist'
 import { GAME_STATUSES, LENGTH_BUCKETS, GAME_MODES } from '../utils/format'
+import { scheduleAutoClear } from '../utils/completionTracking'
 
 const EMPTY_FILTERS = {
   statuses: new Set(),
@@ -58,6 +59,7 @@ export default function GamesTab() {
   function handleSetStatus(id, status) {
     if (status === 'played') {
       setJustCompletedIds((prev) => new Set(prev).add(id))
+      scheduleAutoClear(setJustCompletedIds, id)
     }
     setStatus(id, status)
   }
@@ -69,6 +71,14 @@ export default function GamesTab() {
       return next
     })
     setRating(id, rating)
+  }
+
+  function handleSkipRating(id) {
+    setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
   }
 
   const hasActiveFilters =
@@ -248,6 +258,8 @@ export default function GamesTab() {
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
                 onSetRating={handleSetRating}
+                onSkipRating={handleSkipRating}
+                isPendingRating={justCompletedIds.has(item.id)}
                 allTags={allTags}
                 dimDone={filters.tags.size === 0}
               />
@@ -271,6 +283,8 @@ export default function GamesTab() {
               onRemove={removeItem}
               onToggleTag={toggleTag}
               onSetRating={handleSetRating}
+                onSkipRating={handleSkipRating}
+                isPendingRating={justCompletedIds.has(item.id)}
               allTags={allTags}
               dimDone={filters.tags.size === 0}
             />

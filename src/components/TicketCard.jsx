@@ -6,6 +6,7 @@ import SeasonStatusControl from './SeasonStatusControl'
 import TvStatusControl from './TvStatusControl'
 import TagMenu from './TagMenu'
 import StarRating from './StarRating'
+import InlineRatingPrompt from './InlineRatingPrompt'
 
 const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
 
@@ -16,9 +17,11 @@ export default function TicketCard({
   onRemove,
   onToggleTag,
   onSetRating,
+  onSkipRating,
   allTags,
   inWatchingSection,
   dimDone = true,
+  isPendingRating = false,
 }) {
   const isTv = item.mediaType === 'tv' && Array.isArray(item.seasons) && item.seasons.length > 0
   const tags = item.tags || []
@@ -78,36 +81,36 @@ export default function TicketCard({
           )}
         </div>
         <span className="media-card-runtime">{formatRuntime(item.runtimeMinutes)}</span>
-        <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
+        {!isPendingRating && (
+          <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
+        )}
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
-        {isTv && inWatchingSection && (
+        {isPendingRating ? (
+          <InlineRatingPrompt
+            rating={item.rating}
+            onSetRating={(r) => onSetRating(item.id, r)}
+            onSkip={() => onSkipRating(item.id)}
+          />
+        ) : isTv && inWatchingSection ? (
           <SeasonStatusControl
             seasons={item.seasons}
             onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
             onSetStatus={(s) => onSetStatus(item.id, s)}
-            rating={item.rating}
-            onSetRating={(r) => onSetRating(item.id, r)}
           />
-        )}
-        {isTv && !inWatchingSection && (
+        ) : isTv && !inWatchingSection ? (
           <TvStatusControl
             status={item.status}
             seasons={item.seasons}
             onSetStatus={(s) => onSetStatus(item.id, s)}
             onToggleSeason={(seasonIndex) => onToggleSeason(item.id, seasonIndex)}
-            rating={item.rating}
-            onSetRating={(r) => onSetRating(item.id, r)}
           />
-        )}
-        {!isTv && (
+        ) : (
           <StatusStub
             statuses={WATCH_STATUSES}
             status={item.status}
             onSetStatus={(s) => onSetStatus(item.id, s)}
             labels={LABELS}
-            rating={item.rating}
-            onSetRating={(r) => onSetRating(item.id, r)}
           />
         )}
       </div>

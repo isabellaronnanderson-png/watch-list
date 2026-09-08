@@ -815,24 +815,23 @@ input:focus-visible,
   animation: confetti-burst 0.75s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
 }
 
-.rating-prompt {
-  position: fixed;
-  z-index: 1000;
+.inline-rating-prompt {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: #fff;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: var(--surface-alt);
   border: 1px solid var(--border);
   border-radius: 8px;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
-  padding: 10px 14px;
-  animation: rating-prompt-in 0.18s ease-out;
+  padding: 10px 12px;
+  margin-top: 8px;
+  animation: inline-rating-in 0.18s ease-out;
 }
 
-@keyframes rating-prompt-in {
+@keyframes inline-rating-in {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(3px);
   }
   to {
     opacity: 1;
@@ -840,32 +839,35 @@ input:focus-visible,
   }
 }
 
-.rating-prompt span {
+.inline-rating-label {
   font-family: var(--font-sans);
   font-size: 12px;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-.rating-prompt .star-rating {
+.inline-rating-prompt .star-rating {
   margin-top: 0;
 }
 
-.rating-prompt .star-btn {
+.inline-rating-prompt .star-btn {
   font-size: 17px;
 }
 
-.rating-prompt-close {
+.inline-rating-skip {
+  margin-left: auto;
   background: none;
   border: none;
   color: var(--text-faint);
-  font-size: 15px;
-  line-height: 1;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
   cursor: pointer;
   padding: 0;
 }
 
-.rating-prompt-close:hover {
+.inline-rating-skip:hover {
   color: var(--text);
 }
 
@@ -1449,4 +1451,91 @@ input:focus-visible,
   background: #f0f0f0;
   padding: 2px 6px;
   border-radius: 3px;
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width: 640px) {
+  .app-shell {
+    padding: 0 12px 60px;
+  }
+
+  .site-header {
+    padding: 20px 0 6px;
+  }
+
+  .masthead {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 2px;
+    padding: 16px 0 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .masthead-link {
+    padding: 6px 8px;
+    font-size: 10px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .media-grid-h,
+  .media-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .media-card-h .media-card-cover {
+    width: 70px;
+  }
+
+  .media-card-body {
+    padding: 8px 8px 10px;
+    gap: 3px;
+  }
+
+  .media-card-title {
+    font-size: 13px;
+  }
+
+  .media-card-sub,
+  .media-card-kind,
+  .media-card-year,
+  .media-card-runtime {
+    font-size: 9px;
+  }
+
+  .media-card-barcode,
+  .media-card-ticket-no {
+    display: none;
+  }
+
+  .provider-stamp,
+  .tag-chip {
+    font-size: 7px;
+    padding: 1px 4px;
+  }
+
+  .stub-status-btn {
+    font-size: 8px;
+    padding: 4px 2px;
+  }
+
+  .star-btn {
+    font-size: 12px;
+  }
+
+  .filter-window {
+    padding: 12px 14px;
+    gap: 14px;
+  }
+
+  .inline-rating-prompt {
+    padding: 8px;
+    gap: 4px;
+  }
+
+  .inline-rating-label {
+    font-size: 10px;
+  }
 }

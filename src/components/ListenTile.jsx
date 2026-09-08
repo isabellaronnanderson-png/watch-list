@@ -3,10 +3,21 @@ import { LISTEN_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
 import StarRating from './StarRating'
+import InlineRatingPrompt from './InlineRatingPrompt'
 
 const LABELS = { want: 'Want', listening: 'Listening', listened: 'Listened' }
 
-export default function ListenTile({ item, onSetStatus, onRemove, onToggleTag, onSetRating, allTags, dimDone = true }) {
+export default function ListenTile({
+  item,
+  onSetStatus,
+  onRemove,
+  onToggleTag,
+  onSetRating,
+  onSkipRating,
+  allTags,
+  dimDone = true,
+  isPendingRating = false,
+}) {
   const isAudiobook = item.kind === 'audiobook'
   const cover = isAudiobook
     ? item.coverUrl || (item.coverId ? openLibraryCoverUrl(item.coverId, 'M') : null)
@@ -58,17 +69,25 @@ export default function ListenTile({ item, onSetStatus, onRemove, onToggleTag, o
             ))}
           </div>
         )}
-        <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
+        {!isPendingRating && (
+          <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
+        )}
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
-        <StatusStub
-          statuses={LISTEN_STATUSES}
-          status={item.status}
-          onSetStatus={(s) => onSetStatus(item.id, s)}
-          labels={LABELS}
-          rating={item.rating}
-          onSetRating={(r) => onSetRating(item.id, r)}
-        />
+        {isPendingRating ? (
+          <InlineRatingPrompt
+            rating={item.rating}
+            onSetRating={(r) => onSetRating(item.id, r)}
+            onSkip={() => onSkipRating(item.id)}
+          />
+        ) : (
+          <StatusStub
+            statuses={LISTEN_STATUSES}
+            status={item.status}
+            onSetStatus={(s) => onSetStatus(item.id, s)}
+            labels={LABELS}
+          />
+        )}
       </div>
     </article>
   )

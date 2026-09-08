@@ -2,11 +2,22 @@ import { GAME_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
 import StarRating from './StarRating'
+import InlineRatingPrompt from './InlineRatingPrompt'
 
 const LABELS = { want: 'Want', playing: 'Playing', played: 'Played' }
 const MODE_LABELS = { singleplayer: 'Singleplayer', multiplayer: 'Multiplayer' }
 
-export default function GameTicket({ item, onSetStatus, onRemove, onToggleTag, onSetRating, allTags, dimDone = true }) {
+export default function GameTicket({
+  item,
+  onSetStatus,
+  onRemove,
+  onToggleTag,
+  onSetRating,
+  onSkipRating,
+  allTags,
+  dimDone = true,
+  isPendingRating = false,
+}) {
   const tags = item.tags || []
 
   return (
@@ -69,17 +80,25 @@ export default function GameTicket({ item, onSetStatus, onRemove, onToggleTag, o
         <span className="media-card-runtime">
           {item.playtimeHours ? `~${item.playtimeHours}H` : '— H'}
         </span>
-        <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
+        {!isPendingRating && (
+          <StarRating rating={item.rating} onSetRating={(r) => onSetRating(item.id, r)} />
+        )}
         <div className="media-card-barcode" />
         <span className="media-card-ticket-no">Admit One · No. {ticketNumber(item.id)}</span>
-        <StatusStub
-          statuses={GAME_STATUSES}
-          status={item.status}
-          onSetStatus={(s) => onSetStatus(item.id, s)}
-          labels={LABELS}
-          rating={item.rating}
-          onSetRating={(r) => onSetRating(item.id, r)}
-        />
+        {isPendingRating ? (
+          <InlineRatingPrompt
+            rating={item.rating}
+            onSetRating={(r) => onSetRating(item.id, r)}
+            onSkip={() => onSkipRating(item.id)}
+          />
+        ) : (
+          <StatusStub
+            statuses={GAME_STATUSES}
+            status={item.status}
+            onSetStatus={(s) => onSetStatus(item.id, s)}
+            labels={LABELS}
+          />
+        )}
       </div>
     </article>
   )

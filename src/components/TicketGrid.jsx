@@ -20,9 +20,11 @@ export default function TicketGrid({
   onRemove,
   onToggleTag,
   onSetRating,
+  onSkipRating,
   allTags,
   inWatchingSection,
   dimDone,
+  pendingRatingIds,
 }) {
   return (
     <div className="media-grid-h">
@@ -35,9 +37,11 @@ export default function TicketGrid({
           onRemove={onRemove}
           onToggleTag={onToggleTag}
           onSetRating={onSetRating}
+          onSkipRating={onSkipRating}
           allTags={allTags}
           inWatchingSection={inWatchingSection}
           dimDone={dimDone}
+          isPendingRating={pendingRatingIds?.has(item.id)}
         />
       ))}
     </div>

@@ -5,6 +5,7 @@ import TagFilterGroup from './TagFilterGroup'
 import RatingFilterGroup from './RatingFilterGroup'
 import { useWatchLater } from '../hooks/useWatchLater'
 import { WATCH_STATUSES } from '../utils/format'
+import { scheduleAutoClear } from '../utils/completionTracking'
 
 const EMPTY_FILTERS = { statuses: new Set(), tags: new Set(), ratings: new Set(), sort: 'title' }
 
@@ -52,6 +53,7 @@ export default function WatchLaterTab() {
   function handleSetStatus(id, status) {
     if (status === 'watched') {
       setJustCompletedIds((prev) => new Set(prev).add(id))
+      scheduleAutoClear(setJustCompletedIds, id)
     }
     setStatus(id, status)
   }
@@ -63,6 +65,14 @@ export default function WatchLaterTab() {
       return next
     })
     setRating(id, rating)
+  }
+
+  function handleSkipRating(id) {
+    setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
   }
 
   const hasActiveFilters =
@@ -153,6 +163,8 @@ export default function WatchLaterTab() {
                 onRemove={removeItem}
                 onToggleTag={toggleTag}
                 onSetRating={handleSetRating}
+                onSkipRating={handleSkipRating}
+                isPendingRating={justCompletedIds.has(item.id)}
                 allTags={allTags}
                 dimDone={filters.tags.size === 0}
               />
@@ -176,6 +188,8 @@ export default function WatchLaterTab() {
               onRemove={removeItem}
               onToggleTag={toggleTag}
               onSetRating={handleSetRating}
+                onSkipRating={handleSkipRating}
+                isPendingRating={justCompletedIds.has(item.id)}
               allTags={allTags}
               dimDone={filters.tags.size === 0}
             />

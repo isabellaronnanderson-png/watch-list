@@ -5,6 +5,7 @@ import TicketGrid, { EmptyState } from './TicketGrid'
 import { useWatchlist } from '../hooks/useWatchlist'
 import { getGenreMaps, getDetails } from '../api/tmdb'
 import { RUNTIME_BUCKETS } from '../utils/format'
+import { scheduleAutoClear } from '../utils/completionTracking'
 
 const EMPTY_FILTERS = {
   genres: new Set(),
@@ -97,6 +98,7 @@ export default function WatchTab() {
   function handleSetStatus(id, status) {
     if (status === 'watched') {
       setJustCompletedIds((prev) => new Set(prev).add(id))
+      scheduleAutoClear(setJustCompletedIds, id)
     }
     setStatus(id, status)
   }
@@ -107,6 +109,7 @@ export default function WatchTab() {
       const willComplete = !item.seasons[seasonIndex] && item.seasons.every((s, idx) => (idx === seasonIndex ? true : s))
       if (willComplete) {
         setJustCompletedIds((prev) => new Set(prev).add(id))
+        scheduleAutoClear(setJustCompletedIds, id)
       }
     }
     toggleSeason(id, seasonIndex)
@@ -119,6 +122,14 @@ export default function WatchTab() {
       return next
     })
     setRating(id, rating)
+  }
+
+  function handleSkipRating(id) {
+    setJustCompletedIds((prev) => {
+      const next = new Set(prev)
+      next.delete(id)
+      return next
+    })
   }
 
   const hasActiveFilters =
@@ -224,9 +235,11 @@ export default function WatchTab() {
             onRemove={removeItem}
             onToggleTag={toggleTag}
             onSetRating={handleSetRating}
+            onSkipRating={handleSkipRating}
             allTags={allTags}
             inWatchingSection
             dimDone={filters.tags.size === 0}
+            pendingRatingIds={justCompletedIds}
           />
           <div className="section-divider" />
         </>
@@ -244,8 +257,10 @@ export default function WatchTab() {
           onRemove={removeItem}
           onToggleTag={toggleTag}
           onSetRating={handleSetRating}
+          onSkipRating={handleSkipRating}
           allTags={allTags}
           dimDone={filters.tags.size === 0}
+          pendingRatingIds={justCompletedIds}
         />
       ) : (
         watchingItems.length === 0 && <EmptyState hasAnyItems={items.length > 0} />
