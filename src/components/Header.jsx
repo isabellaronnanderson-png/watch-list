@@ -136,7 +136,21 @@ export default function Header({ onAdd, existingIds, genreMaps }) {
           placeholder="Search for a film or show…"
           aria-label="Search for a film or TV show to add"
         />
-        <span className="search-bar-label">Search</span>
+        {query ? (
+          <button
+            type="button"
+            className="search-bar-clear"
+            onClick={() => {
+              setQuery('')
+              setShowResults(false)
+            }}
+            aria-label="Clear search"
+          >
+            ×
+          </button>
+        ) : (
+          <span className="search-bar-label">Search</span>
+        )}
 
         {showResults && (status === 'loading' || status === 'error' || results.length > 0) && (
           <div className="results-panel" role="listbox">

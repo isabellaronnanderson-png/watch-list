@@ -410,6 +410,24 @@ input:focus-visible,
   pointer-events: none;
 }
 
+.search-bar-clear {
+  position: absolute;
+  right: 12px;
+  top: 24px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-faint);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 6px;
+}
+
+.search-bar-clear:hover {
+  color: var(--text);
+}
+
 .search-bar-submit {
   font-family: var(--font-sans);
   font-weight: 500;
@@ -1580,7 +1598,32 @@ input:focus-visible,
     display: none;
   }
 
-  .media-card.is-expanded .media-card-perforation {
+  /* Expanded: go back to a compact row (small image, text/controls to the side)
+     instead of letting a full-width 2:3 poster tower over everything else. */
+  .media-card-h.is-expanded {
+    flex-direction: row;
+  }
+
+  .media-card-h.is-expanded .media-card-cover {
+    width: 90px;
+    aspect-ratio: auto;
+    border-radius: 8px 0 0 8px;
+  }
+
+  .media-card-h.is-expanded .media-card-cover-square {
+    aspect-ratio: auto;
+  }
+
+  .media-card-h.is-expanded .media-card-perforation {
+    display: block;
+    border-top: none;
+    border-left: 2px dashed var(--border);
+    margin: 14px 0;
+    height: auto;
+    align-self: stretch;
+  }
+
+  .media-card.is-expanded:not(.media-card-h) .media-card-perforation {
     display: block;
     border-top: 2px dashed var(--border);
     border-left: none;
@@ -1632,6 +1675,26 @@ input:focus-visible,
     flex-direction: column;
     gap: 4px;
     margin-top: 4px;
+  }
+
+  /* Delete is easy to hit by accident on a small screen - keep it out of the
+     way until a card is deliberately expanded. */
+  .media-card-remove {
+    display: none;
+  }
+
+  .media-card.is-expanded .media-card-remove {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* Status buttons get real tap targets instead of being squeezed 3-across. */
+  .media-card.is-expanded .stub-status {
+    flex-direction: column;
+  }
+
+  .media-card.is-expanded .stub-status-btn {
+    padding: 9px 4px;
   }
 
   .media-card-sub,
