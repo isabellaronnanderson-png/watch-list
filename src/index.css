@@ -1770,3 +1770,85 @@ input:focus-visible,
     font-size: 10px;
   }
 }
+
+/* ---------- Pick for me: spotlight + prompt ---------- */
+
+.has-pick .media-card:not(.is-picked) {
+  opacity: 0.4;
+  transition: opacity 0.25s ease;
+}
+
+.media-card.is-picked,
+.media-card.is-picked.is-done {
+  opacity: 1;
+  position: relative;
+  z-index: 2;
+  outline: 3px solid var(--tab-accent);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 9px rgba(var(--tab-accent-rgb), 0.16), 0 16px 36px rgba(0, 0, 0, 0.2);
+}
+
+.pick-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(var(--tab-accent-rgb), 0.1);
+  border: 1px solid var(--tab-accent);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  animation: inline-rating-in 0.18s ease-out;
+}
+
+.pick-prompt-label {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.pick-prompt-note {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.pick-prompt-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pick-prompt-start {
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+.pick-prompt-dismiss {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.pick-prompt-dismiss:hover {
+  color: var(--text);
+}

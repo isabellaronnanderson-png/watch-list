@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { usePickedId } from '../utils/pickStore'
+import PickPrompt from './PickPrompt'
 import { LISTEN_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
@@ -19,12 +21,13 @@ export default function AlbumTicket({
   isPendingRating = false,
 }) {
   const [expanded, setExpanded] = useState(false)
+  const isPicked = usePickedId() === item.id
   const tags = item.tags || []
 
   return (
     <article
       id={item.id}
-      className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}
+      className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}
     >
       <button
         className="media-card-remove media-card-remove-left"
@@ -63,6 +66,14 @@ export default function AlbumTicket({
             {expanded ? '▲' : '▼'}
           </button>
         </div>
+        {isPicked && (
+          <PickPrompt
+            item={item}
+            startStatus="listening"
+            startLabel="Start listening"
+            onSetStatus={onSetStatus}
+          />
+        )}
         <div className="media-card-detail">
           <p className="media-card-sub">{item.artist}</p>
           {item.genres?.length > 0 && (

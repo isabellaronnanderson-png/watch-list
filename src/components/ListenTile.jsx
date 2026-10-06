@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { usePickedId } from '../utils/pickStore'
+import PickPrompt from './PickPrompt'
 import { coverUrl as openLibraryCoverUrl } from '../api/openLibrary'
 import { LISTEN_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
@@ -20,6 +22,7 @@ export default function ListenTile({
   isPendingRating = false,
 }) {
   const [expanded, setExpanded] = useState(false)
+  const isPicked = usePickedId() === item.id
   const isAudiobook = item.kind === 'audiobook'
   const cover = isAudiobook
     ? item.coverUrl || (item.coverId ? openLibraryCoverUrl(item.coverId, 'M') : null)
@@ -29,7 +32,7 @@ export default function ListenTile({
   return (
     <article
       id={item.id}
-      className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}
+      className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}
     >
       <button
         className="media-card-remove media-card-remove-left"
@@ -68,6 +71,14 @@ export default function ListenTile({
             {expanded ? '▲' : '▼'}
           </button>
         </div>
+        {isPicked && (
+          <PickPrompt
+            item={item}
+            startStatus="listening"
+            startLabel="Start listening"
+            onSetStatus={onSetStatus}
+          />
+        )}
         <div className="media-card-detail">
           {isAudiobook ? (
             <p className="media-card-sub">{item.author}</p>

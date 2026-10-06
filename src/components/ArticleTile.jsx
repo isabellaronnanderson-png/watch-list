@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { usePickedId } from '../utils/pickStore'
+import PickPrompt from './PickPrompt'
 import { READ_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
@@ -7,10 +9,11 @@ const LABELS = { want: 'Want', reading: 'Reading', read: 'Read' }
 
 export default function ArticleTile({ item, onSetStatus, onRemove, onToggleTag, allTags, dimDone = true }) {
   const [expanded, setExpanded] = useState(false)
+  const isPicked = usePickedId() === item.id
   const tags = item.tags || []
 
   return (
-    <article id={item.id} className={`media-card${item.status === 'read' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}>
+    <article id={item.id} className={`media-card${item.status === 'read' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}
@@ -48,6 +51,14 @@ export default function ArticleTile({ item, onSetStatus, onRemove, onToggleTag, 
             {expanded ? '▲' : '▼'}
           </button>
         </div>
+        {isPicked && (
+          <PickPrompt
+            item={item}
+            startStatus="reading"
+            startLabel="Start reading"
+            onSetStatus={onSetStatus}
+          />
+        )}
         <div className="media-card-detail">
           {item.publisher && <p className="media-card-sub">{item.publisher}</p>}
           {tags.length > 0 && (

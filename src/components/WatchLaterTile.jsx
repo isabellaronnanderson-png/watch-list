@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { usePickedId } from '../utils/pickStore'
+import PickPrompt from './PickPrompt'
 import { WATCH_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
@@ -7,10 +9,11 @@ const LABELS = { want: 'Want', watching: 'Watching', watched: 'Watched' }
 
 export default function WatchLaterTile({ item, onSetStatus, onRemove, onToggleTag, allTags, dimDone = true }) {
   const [expanded, setExpanded] = useState(false)
+  const isPicked = usePickedId() === item.id
   const tags = item.tags || []
 
   return (
-    <article id={item.id} className={`media-card${item.status === 'watched' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}>
+    <article id={item.id} className={`media-card${item.status === 'watched' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}
@@ -43,6 +46,14 @@ export default function WatchLaterTile({ item, onSetStatus, onRemove, onToggleTa
             {expanded ? '▲' : '▼'}
           </button>
         </div>
+        {isPicked && (
+          <PickPrompt
+            item={item}
+            startStatus="watching"
+            startLabel="Start watching"
+            onSetStatus={onSetStatus}
+          />
+        )}
         <div className="media-card-detail">
           {item.channel && <p className="media-card-sub">{item.channel}</p>}
           {tags.length > 0 && (

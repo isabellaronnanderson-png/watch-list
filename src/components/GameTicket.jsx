@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { usePickedId } from '../utils/pickStore'
+import PickPrompt from './PickPrompt'
 import { GAME_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
 import TagMenu from './TagMenu'
@@ -20,12 +22,13 @@ export default function GameTicket({
   isPendingRating = false,
 }) {
   const [expanded, setExpanded] = useState(false)
+  const isPicked = usePickedId() === item.id
   const tags = item.tags || []
 
   return (
     <article
       id={item.id}
-      className={`media-card${item.status === 'played' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}
+      className={`media-card${item.status === 'played' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}
     >
       <button
         className="media-card-remove media-card-remove-left"
@@ -67,6 +70,14 @@ export default function GameTicket({
             {expanded ? '▲' : '▼'}
           </button>
         </div>
+        {isPicked && (
+          <PickPrompt
+            item={item}
+            startStatus="playing"
+            startLabel="Start playing"
+            onSetStatus={onSetStatus}
+          />
+        )}
         <div className="media-card-detail">
           {item.platforms?.length > 0 && (
             <p className="media-card-sub">{item.platforms.slice(0, 3).join(' · ')}</p>

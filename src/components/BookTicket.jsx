@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { usePickedId } from '../utils/pickStore'
+import PickPrompt from './PickPrompt'
 import { coverUrl as openLibraryCoverUrl } from '../api/openLibrary'
 import { formatPages, READ_STATUSES, ticketNumber } from '../utils/format'
 import StatusStub from './StatusStub'
@@ -20,13 +22,14 @@ export default function BookTicket({
   isPendingRating = false,
 }) {
   const [expanded, setExpanded] = useState(false)
+  const isPicked = usePickedId() === item.id
   const cover = item.coverUrl || (item.coverId ? openLibraryCoverUrl(item.coverId, 'M') : null)
   const tags = item.tags || []
 
   return (
     <article
       id={item.id}
-      className={`media-card media-card-h${item.status === 'read' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}
+      className={`media-card media-card-h${item.status === 'read' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}
     >
       <button
         className="media-card-remove media-card-remove-left"
@@ -68,6 +71,14 @@ export default function BookTicket({
             {expanded ? '▲' : '▼'}
           </button>
         </div>
+        {isPicked && (
+          <PickPrompt
+            item={item}
+            startStatus="reading"
+            startLabel="Start reading"
+            onSetStatus={onSetStatus}
+          />
+        )}
         <div className="media-card-detail">
           <p className="media-card-sub">{item.author}</p>
           {item.genres?.length > 0 && (

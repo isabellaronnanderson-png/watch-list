@@ -1,18 +1,28 @@
-import { useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { scrollToItem } from '../utils/scrollToItem'
+import { setPick, clearPick, usePickedId } from '../utils/pickStore'
 
-// Picks a random item from whatever the current filters leave visible, then
-// scrolls to it with the usual flash highlight. On mobile the card is also
-// expanded so its controls are right there.
+// Picks a random item from whatever the current filters leave visible. The
+// choice is spotlighted (everything else dims) until it's started or dismissed.
 export default function PickForMe({ items }) {
-  const [pickedId, setPickedId] = useState(null)
+  const pickedId = usePickedId()
+  const lastRef = useRef(null)
+
+  // Leaving the tab shouldn't leave a stale spotlight behind.
+  useEffect(() => () => clearPick(), [])
+
+  useEffect(() => {
+    document.body.classList.toggle('has-pick', Boolean(pickedId))
+    return () => document.body.classList.remove('has-pick')
+  }, [pickedId])
 
   function pick() {
     if (items.length === 0) return
     // Avoid handing back the same item twice in a row when there's a choice.
-    const pool = items.length > 1 ? items.filter((i) => i.id !== pickedId) : items
+    const pool = items.length > 1 ? items.filter((i) => i.id !== lastRef.current) : items
     const choice = pool[Math.floor(Math.random() * pool.length)]
-    setPickedId(choice.id)
+    lastRef.current = choice.id
+    setPick(choice.id)
 
     const el = document.getElementById(choice.id)
     const toggle = el?.querySelector('.mobile-expand-toggle')

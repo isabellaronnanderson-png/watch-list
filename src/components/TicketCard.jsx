@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { usePickedId } from '../utils/pickStore'
+import PickPrompt from './PickPrompt'
 import { posterUrl } from '../api/tmdb'
 import { formatRuntime, WATCH_STATUSES, ticketNumber } from '../utils/format'
 import { providerLabel } from '../utils/providers'
@@ -36,13 +38,14 @@ export default function TicketCard({
   isPendingRating = false,
 }) {
   const [expanded, setExpanded] = useState(false)
+  const isPicked = usePickedId() === item.id
   const isTv = item.mediaType === 'tv' && Array.isArray(item.seasons) && item.seasons.length > 0
   const tags = item.tags || []
 
   return (
     <article
       id={item.id}
-      className={`media-card media-card-h${item.status === 'watched' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}
+      className={`media-card media-card-h${item.status === 'watched' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}
     >
       <button
         className="media-card-remove media-card-remove-left"
@@ -84,6 +87,14 @@ export default function TicketCard({
             {expanded ? '▲' : '▼'}
           </button>
         </div>
+        {isPicked && (
+          <PickPrompt
+            item={item}
+            startStatus="watching"
+            startLabel="Start watching"
+            onSetStatus={onSetStatus}
+          />
+        )}
         <div className="media-card-detail">
           {item.genres?.length > 0 && (
             <p className="media-card-sub">{item.genres.slice(0, 3).join(' · ')}</p>
