@@ -65,7 +65,7 @@ export default function WatchLaterTab() {
     <>
       <WatchLaterHeader onAdd={addItem} existingIds={existingIds} />
 
-      <MobileFilterToggle>
+      <MobileFilterToggle pickItems={visibleItems}>
         <div className="filter-group">
           <span className="filter-group-label">Status</span>
           <div className="chip-row">

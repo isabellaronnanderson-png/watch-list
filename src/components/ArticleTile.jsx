@@ -10,7 +10,7 @@ export default function ArticleTile({ item, onSetStatus, onRemove, onToggleTag, 
   const tags = item.tags || []
 
   return (
-    <article className={`media-card${item.status === 'read' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}>
+    <article id={item.id} className={`media-card${item.status === 'read' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}

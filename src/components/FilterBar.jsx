@@ -20,9 +20,10 @@ export default function FilterBar({
   onSortChange,
   onClear,
   hasActiveFilters,
+  pickItems,
 }) {
   return (
-    <MobileFilterToggle>
+    <MobileFilterToggle pickItems={pickItems}>
       <div className="filter-group">
         <span className="filter-group-label">Status</span>
         <div className="chip-row">

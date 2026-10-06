@@ -10,7 +10,7 @@ export default function WatchLaterTile({ item, onSetStatus, onRemove, onToggleTa
   const tags = item.tags || []
 
   return (
-    <article className={`media-card${item.status === 'watched' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}>
+    <article id={item.id} className={`media-card${item.status === 'watched' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}`}>
       <button
         className="media-card-remove media-card-remove-left"
         onClick={() => onRemove(item.id)}

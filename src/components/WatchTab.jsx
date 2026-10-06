@@ -227,6 +227,7 @@ export default function WatchTab() {
       )}
 
       <FilterBar
+        pickItems={visibleItems}
         allGenres={allGenres}
         allTags={tagFilterOptions}
         filters={filters}
