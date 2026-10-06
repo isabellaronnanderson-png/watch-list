@@ -32,7 +32,7 @@ export default function ListenTile({
   return (
     <article
       id={item.id}
-      className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}
+      className={`media-card media-card-h${item.status === 'listened' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}${isPendingRating ? ' is-rating' : ''}`}
     >
       <button
         className="media-card-remove media-card-remove-left"

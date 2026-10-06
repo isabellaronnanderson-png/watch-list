@@ -29,7 +29,7 @@ export default function BookTicket({
   return (
     <article
       id={item.id}
-      className={`media-card media-card-h${item.status === 'read' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}
+      className={`media-card media-card-h${item.status === 'read' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}${isPendingRating ? ' is-rating' : ''}`}
     >
       <button
         className="media-card-remove media-card-remove-left"

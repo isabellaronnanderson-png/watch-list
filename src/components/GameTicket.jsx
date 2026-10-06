@@ -28,7 +28,7 @@ export default function GameTicket({
   return (
     <article
       id={item.id}
-      className={`media-card${item.status === 'played' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}`}
+      className={`media-card${item.status === 'played' && dimDone ? ' is-done' : ''}${expanded ? ' is-expanded' : ''}${isPicked ? ' is-picked' : ''}${isPendingRating ? ' is-rating' : ''}`}
     >
       <button
         className="media-card-remove media-card-remove-left"
