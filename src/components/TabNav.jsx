@@ -6,6 +6,7 @@ const TABS = [
   { id: 'albums', label: 'Albums', accent: '232, 132, 45' },
   { id: 'games', label: 'Play', accent: '139, 47, 201' },
   { id: 'watchlater', label: 'YouTube', accent: '229, 52, 42' },
+  { id: 'diary', label: 'Diary', accent: '17, 17, 17' },
 ]
 
 export default function TabNav({ active, onChange }) {
@@ -14,7 +15,7 @@ export default function TabNav({ active, onChange }) {
       {TABS.map((t) => (
         <button
           key={t.id}
-          className={`masthead-link${active === t.id ? ' is-active' : ''}`}
+          className={`masthead-link${t.id === 'diary' ? ' masthead-diary' : ''}${active === t.id ? ' is-active' : ''}`}
           style={{ '--btn-accent-rgb': t.accent, '--btn-accent': `rgb(${t.accent})` }}
           onClick={() => onChange(t.id)}
           aria-current={active === t.id ? 'page' : undefined}

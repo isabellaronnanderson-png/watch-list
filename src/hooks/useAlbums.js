@@ -3,6 +3,7 @@ import { makeTagActions } from './tagHelpers'
 import { makeRatingActions } from './ratingHelpers'
 import { useAuthContext } from './AuthContext'
 import { useCloudSync } from './useCloudSync'
+import { stampCompletion } from '../utils/completion'
 
 const STORAGE_KEY = 'marquee-watchlist:albums'
 
@@ -45,11 +46,18 @@ export function useAlbums() {
   }, [])
 
   const setStatus = useCallback((id, status) => {
-    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
+    setItems((prev) =>
+      prev.map((p) => (p.id === id ? stampCompletion(p, { ...p, status }) : p))
+    )
+  }, [])
+
+  // Lets the Diary correct the day something was finished.
+  const setCompletedAt = useCallback((id, completedAt) => {
+    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, completedAt } : p)))
   }, [])
 
   const { toggleTag, renameTag, deleteTag } = useMemo(() => makeTagActions(setItems), [])
   const { setRating } = useMemo(() => makeRatingActions(setItems), [])
 
-  return { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag }
+  return { items, addItem, removeItem, setStatus, setCompletedAt, setRating, toggleTag, renameTag, deleteTag }
 }

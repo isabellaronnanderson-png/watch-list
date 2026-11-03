@@ -10,6 +10,7 @@ import AlbumsTab from './components/AlbumsTab'
 import GamesTab from './components/GamesTab'
 import WatchLaterTab from './components/WatchLaterTab'
 import ArticlesTab from './components/ArticlesTab'
+import DiaryTab from './components/DiaryTab'
 
 function AppShell() {
   const [tab, setTab] = useState('watch')
@@ -25,6 +26,7 @@ function AppShell() {
       {tab === 'games' && <GamesTab />}
       {tab === 'watchlater' && <WatchLaterTab />}
       {tab === 'articles' && <ArticlesTab />}
+      {tab === 'diary' && <DiaryTab />}
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { canonicalizeProvider } from '../utils/providers'
 import { useAuthContext } from './AuthContext'
 import { useCloudSync } from './useCloudSync'
+import { stampCompletion } from '../utils/completion'
 
 const STORAGE_KEY = 'marquee-watchlist:items'
 
@@ -115,7 +116,14 @@ export function useWatchlist() {
 
   // Movies use this directly (Want / Watching / Watched buttons).
   const setStatus = useCallback((id, status) => {
-    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
+    setItems((prev) =>
+      prev.map((p) => (p.id === id ? stampCompletion(p, { ...p, status }) : p))
+    )
+  }, [])
+
+  // Lets the Diary correct the day something was finished.
+  const setCompletedAt = useCallback((id, completedAt) => {
+    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, completedAt } : p)))
   }, [])
 
   const setRating = useCallback((id, rating) => {
@@ -128,7 +136,7 @@ export function useWatchlist() {
       prev.map((p) => {
         if (p.id !== id || !Array.isArray(p.seasons)) return p
         const seasons = p.seasons.map((s, i) => (i === seasonIndex ? !s : s))
-        return { ...p, seasons, status: deriveStatus(seasons) }
+        return stampCompletion(p, { ...p, seasons, status: deriveStatus(seasons) })
       })
     )
   }, [])
@@ -141,7 +149,12 @@ export function useWatchlist() {
       prev.map((p) => {
         if (p.id !== id || !Array.isArray(p.seasons) || newCount <= p.seasons.length) return p
         const seasons = [...p.seasons, ...Array(newCount - p.seasons.length).fill(false)]
-        return { ...p, seasons, numberOfSeasons: newCount, status: deriveStatus(seasons) }
+        return stampCompletion(p, {
+          ...p,
+          seasons,
+          numberOfSeasons: newCount,
+          status: deriveStatus(seasons),
+        })
       })
     )
   }, [])
@@ -151,6 +164,7 @@ export function useWatchlist() {
     addItem,
     removeItem,
     setStatus,
+    setCompletedAt,
     setRating,
     toggleSeason,
     updateSeasonCount,

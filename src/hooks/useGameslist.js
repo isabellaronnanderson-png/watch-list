@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { makeTagActions } from './tagHelpers'
 import { useAuthContext } from './AuthContext'
 import { useCloudSync } from './useCloudSync'
+import { stampCompletion } from '../utils/completion'
 import { makeRatingActions } from './ratingHelpers'
 
 const STORAGE_KEY = 'marquee-watchlist:games'
@@ -45,11 +46,18 @@ export function useGameslist() {
   }, [])
 
   const setStatus = useCallback((id, status) => {
-    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)))
+    setItems((prev) =>
+      prev.map((p) => (p.id === id ? stampCompletion(p, { ...p, status }) : p))
+    )
+  }, [])
+
+  // Lets the Diary correct the day something was finished.
+  const setCompletedAt = useCallback((id, completedAt) => {
+    setItems((prev) => prev.map((p) => (p.id === id ? { ...p, completedAt } : p)))
   }, [])
 
   const { toggleTag, renameTag, deleteTag } = useMemo(() => makeTagActions(setItems), [])
   const { setRating } = useMemo(() => makeRatingActions(setItems), [])
 
-  return { items, addItem, removeItem, setStatus, setRating, toggleTag, renameTag, deleteTag }
+  return { items, addItem, removeItem, setStatus, setCompletedAt, setRating, toggleTag, renameTag, deleteTag }
 }
