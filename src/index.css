@@ -2122,14 +2122,32 @@ input:focus-visible,
   text-underline-offset: 3px;
 }
 
+.diary-edit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
 .diary-date-input {
-  width: 130px;
-  margin-left: -4px;
   font-family: var(--font-sans);
-  font-size: 12px;
-  padding: 4px;
+  font-size: 13px;
+  padding: 5px 8px;
   border: 1px solid var(--text);
+  border-radius: 0;
   background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+
+.diary-date-input:focus,
+.diary-date-input:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .diary-cover {

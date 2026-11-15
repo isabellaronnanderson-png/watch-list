@@ -156,35 +156,18 @@ export default function DiaryTab() {
                     style={{ '--entry-accent-rgb': accent }}
                   >
                     <div className="diary-date">
-                      {editingKey === entryKey ? (
-                        <input
-                          type="date"
-                          className="diary-date-input"
-                          autoFocus
-                          max={toInputDate(Date.now())}
-                          defaultValue={toInputDate(item.completedAt)}
-                          onChange={(e) => {
-                            if (e.target.value) {
-                              setters[kind](item.id, fromInputDate(e.target.value))
-                              setEditingKey(null)
-                            }
-                          }}
-                          onBlur={() => setEditingKey(null)}
-                        />
-                      ) : (
-                        <button
-                          type="button"
-                          className="diary-date-btn"
-                          onClick={() => setEditingKey(entryKey)}
-                          title="Change the date"
-                          aria-label={`Finished ${d.toLocaleDateString('en-GB')}. Change the date`}
-                        >
-                          <span className="diary-day">{d.getDate()}</span>
-                          <span className="diary-weekday">
-                            {d.toLocaleDateString('en-GB', { weekday: 'short' })}
-                          </span>
-                        </button>
-                      )}
+                      <button
+                        type="button"
+                        className="diary-date-btn"
+                        onClick={() => setEditingKey(editingKey === entryKey ? null : entryKey)}
+                        title="Change the date"
+                        aria-label={`Finished ${d.toLocaleDateString('en-GB')}. Change the date`}
+                      >
+                        <span className="diary-day">{d.getDate()}</span>
+                        <span className="diary-weekday">
+                          {d.toLocaleDateString('en-GB', { weekday: 'short' })}
+                        </span>
+                      </button>
                     </div>
                     <div className="diary-cover">
                       {info.cover ? <img src={info.cover} alt="" loading="lazy" /> : null}
@@ -195,6 +178,25 @@ export default function DiaryTab() {
                         <span className="diary-tag">{info.tag}</span>
                         {info.sub ? <span>{info.sub}</span> : null}
                       </div>
+                      {editingKey === entryKey ? (
+                        <label className="diary-edit">
+                          <span>Finished on</span>
+                          <input
+                            type="date"
+                            className="diary-date-input"
+                            autoFocus
+                            max={toInputDate(Date.now())}
+                            defaultValue={toInputDate(item.completedAt)}
+                            onChange={(e) => {
+                              if (e.target.value) {
+                                setters[kind](item.id, fromInputDate(e.target.value))
+                                setEditingKey(null)
+                              }
+                            }}
+                            onBlur={() => setEditingKey(null)}
+                          />
+                        </label>
+                      ) : null}
                     </div>
                     {item.rating > 0 ? (
                       <div className="diary-stars" aria-label={`${item.rating} out of 5`}>
